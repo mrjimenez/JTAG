@@ -1,5 +1,4 @@
 #The JTAG Library for Arduino
-#============================
 
 This library is actually two things.
 
@@ -18,10 +17,10 @@ project, I have used 3 voltage dividers for TCK, TMS and TDI. Each divider
 consisted of one 330 Ohms resistor in series with a 180 Ohms resistor. One leg
 of the 330 Ohms resistor goes to the ground, one leg of the 180 Ohms resistor
 goes to the Arduino. Where two legs meet, this is where you should connect your
-"JTAG" cable.
+JTAG cable.
 
 Those seem to be a bit low values for a voltage divider, but consider the fact
-that you will most likely have around 100 Ohms impedance in your "JTAG"
+that you will most likely have around 100 Ohms impedance in your JTAG
 homemade cable, and higher resistor values will most likely create reflections
 on your signals that will ruin the operation of the JTAG TAP.
 
@@ -37,11 +36,11 @@ mentioned before.
 
 The pin configuration I used was this:
 
-TMS  - pin 8
-TDI  - pin 9
-TDO  - pin 10
-TCK  - pin 11
-VREF - pin 12
+- TMS  - pin 8
+- TDI  - pin 9
+- TDO  - pin 10
+- TCK  - pin 11
+- VREF - pin 12
 
 
 Before using this software
@@ -82,11 +81,11 @@ Using it to play XSVF
    your board. For example, suppose you are in a command prompt in the
    libraries/JTAG folder. Then, the following command will send the following
    four XSVF files to your Arduino board:
-
+```
    $ ./extras/python/xsvf extras/xsvf/XC2C64A/{idcode.xsvf,blank_check.xsvf,erase.xsvf,VHDL-CPLDIntro3LEDinverse.xsvf}
-
+```
    Help is available for the command line parameters:
-
+```
 	$ ./extras/python/xsvf --help
 	usage: xsvf [-h] [-c {upload,disasm}] [-v] [-p PORT] [-b BAUD]
             	    fileName [fileName ...]
@@ -105,7 +104,7 @@ Using it to play XSVF
   	  -b BAUD, --baud BAUD  BAUD rate (type int, default=115200)
 
 	Parameters can be in a file, one per line, using @"file name"
-
+```
 1. In subfolders of the folder "extras/xsvf" you can find several XSVF files
    that you can use to test your hardware. Notice that you MUST use a XSVF file
    generated for your particular hardware. You can generate XSVF files with the
@@ -143,7 +142,7 @@ other projects. As far as I could trace it:
 
 1. [Ben's XSVF-Player](https://github.com/ben0109/XSVF-Player/)
 
-1. [libxsvf](http://www.clifford.at/libxsvf/) Definitely worth taking a look.
+1. [Clifford Wolf's libxsvf](http://www.clifford.at/libxsvf/) Definitely worth taking a look.
 
 1. [Karl Hans Janke's jtagbang](http://www.khjk.org/log/2013/aug/jtagbang.html)
 
@@ -151,6 +150,7 @@ other projects. As far as I could trace it:
 About me
 ========
 
-[My blog](http://eeandcs.blogspot.com.br/). You may contact me on github.
+[My blog is here](http://eeandcs.blogspot.com.br/).
 
+You may contact me on github.
 
