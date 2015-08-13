@@ -36,11 +36,13 @@ mentioned before.
 
 The pin configuration I used was this:
 
-- TMS  - pin 8
-- TDI  - pin 9
-- TDO  - pin 10
-- TCK  - pin 11
-- VREF - pin 12
+| Signal | Arduino pin |
+|:-------|:-----------:|
+| TMS    |  8 |
+| TDI    |  9 |
+| TDO    | 10 |
+| TCK    | 11 |
+| VREF   | 12 |
 
 
 Before using this software
@@ -67,6 +69,38 @@ Installing the library
 This software has been tested under the Arduino IDE version 1.6.5, but should
 work fine with version 1.0. The library should be unpacked to the "libraries"
 directory inside your Arduino "sketches" directory.
+
+
+Compiling
+=========
+
+One quick suggestion: in order to get the most of the USB bandwidth, it is
+possible to increase the size of the receive buffer of the Arduino. I have also
+changed the default compiler optimization level. I added a file called
+"platform.local.txt" to the folder "~/arduino-1.6.5/hardware/arduino/avr" that
+had the following:
+```
+name=Arduino 256S AVR Boards
+version=1.6.7
+
+# AVR compile variables
+# ---------------------
+
+# This can be overriden in boards.txt
+build.extra_flags=
+
+# These can be overridden in platform.local.txt
+compiler.c.extra_flags=-DSERIAL_BUFFER_SIZE=256 -DSERIAL_RX_BUFFER_SIZE=256 -O2
+compiler.c.elf.extra_flags=
+compiler.S.extra_flags=
+compiler.cpp.extra_flags=-DSERIAL_BUFFER_SIZE=256 -DSERIAL_RX_BUFFER_SIZE=256 -O2
+compiler.ar.extra_flags=
+compiler.objcopy.eep.extra_flags=
+compiler.elf2hex.extra_flags=
+```
+
+The best information about the location of the file "platform.local.txt" I
+found was [here](https://github.com/arduino/Arduino/wiki/Boards-Manager-FAQ).
 
 
 Using it to play XSVF
@@ -118,7 +152,9 @@ Using it to play XSVF
 Interesting links
 =================
 
-1. [Generating an SVF, XSVF, or STAPL File](http://www.xilinx.com/support/documentation/sw_manuals/xilinx11/pp_p_process_generate_svf_file.htm)
+1. [Generating an SVF, XSVF, or STAPL File with Impact](http://www.xilinx.com/support/documentation/sw_manuals/xilinx11/pp_p_process_generate_svf_file.htm)
+
+1. [Executing XSVF/SVF Files with Impact](http://www.xilinx.com/itp/xilinx10/isehelp/pim_p_executing_xsvf_svf.htm)
 
 1. [SVF on Wikipedia](https://en.wikipedia.org/wiki/Serial_Vector_Format)
 
@@ -128,23 +164,26 @@ Interesting links
 
 1. [Rohit Dureja's JTAG Simplified](https://rohitdureja.wordpress.com/category/cpldfpga/)
 
+1. [Nice JTAG TAP Controller State Diagram in SVF](https://de.wikipedia.org/wiki/Datei:JTAG_TAP_Controller_State_Diagram.svg)
+
 
 Credits
 =======
 
-I have used Xilinx "XAPP503 - SVF and XSVF File Formats for
-Xilinx Devices", appendix B as reference for XSVF.
+I have used Xilinx [XAPP503 - SVF and XSVF File Formats for Xilinx Devices]
+(http://www.xilinx.com/support/documentation/application_notes/xapp503.pdf),
+appendix B as the reference for XSVF.
 
 This software is actually a major rewrite of code and ideas inspired on many
 other projects. As far as I could trace it:
 
-1. [Mike Tsao's JTAGWhisperer](http://www.sowbug.com/). Project on [GitHub](https://github.com/sowbug/JTAGWhisperer/).
+1. [Mike Tsao's JTAGWhisperer](https://github.com/sowbug/JTAGWhisperer/).
 
-1. [Ben's XSVF-Player](https://github.com/ben0109/XSVF-Player/)
+1. [Ben's XSVF-Player](https://github.com/ben0109/XSVF-Player/).
 
-1. [Clifford Wolf's libxsvf](http://www.clifford.at/libxsvf/) Definitely worth taking a look.
+1. [Clifford Wolf's libxsvf](http://www.clifford.at/libxsvf/). Definitely worth taking a look.
 
-1. [Karl Hans Janke's jtagbang](http://www.khjk.org/log/2013/aug/jtagbang.html)
+1. [Karl Hans Janke's jtagbang](http://www.khjk.org/log/2013/aug/jtagbang.html).
 
 
 About me
