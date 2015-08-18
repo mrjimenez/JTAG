@@ -1,0 +1,36 @@
+07 00                       XREPEAT 0                                           
+13 00                       XENDIR RUN_TEST_IDLE                                
+14 00                       XENDDR RUN_TEST_IDLE                                
+12 00                       XSTATE TEST_LOGIC_RESET                             
+12 01                       XSTATE RUN_TEST_IDLE                                
+02 08 01                    XSIR 8 01                                           
+08 00 00 00 20              XSDRSIZE 32                                         
+01 0F FF 8F FF              XTDOMASK                                            
+                                0F FF 8F FF                                     
+04 00 00 00 00              XRUNTEST 0                                          
+09 00 00 00 00 F6 E5 F0     XSDRTDO                                             
+93                              00 00 00 00                                     
+                                F6 E5 F0 93                                     
+02 08 FF                    XSIR 8 FF                                           
+02 08 01                    XSIR 8 01                                           
+09 00 00 00 00 F6 E5 F0     XSDRTDO                                             
+93                              00 00 00 00                                     
+                                F6 E5 F0 93                                     
+02 08 FF                    XSIR 8 FF                                           
+02 08 01                    XSIR 8 01                                           
+09 00 00 00 00 F6 E5 F0     XSDRTDO                                             
+93                              00 00 00 00                                     
+                                F6 E5 F0 93                                     
+07 00                       XREPEAT 0                                           
+07 20                       XREPEAT 32                                          
+12 00                       XSTATE TEST_LOGIC_RESET                             
+12 01                       XSTATE RUN_TEST_IDLE                                
+04 00 00 00 00              XRUNTEST 0                                          
+02 08 FF                    XSIR 8 FF                                           
+08 00 00 00 01              XSDRSIZE 1                                          
+01 00                       XTDOMASK                                            
+                                00                                              
+09 00 00                    XSDRTDO                                             
+                                00                                              
+                                00                                              
+00                          XCOMPLETE                                           
