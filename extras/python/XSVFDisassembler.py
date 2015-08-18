@@ -200,7 +200,9 @@ class XSVFDisassembler(XSVFDecoder.XSVFDecoder):
         self.pretty_disasm(p)
 
     def disasm_xcomment(self):
-        self.pretty_disasm()
+        p = []
+        p.append('{:s}'.format(self.comment))
+        self.pretty_disasm(p)
 
     def disasm_xwait(self):
         p = []
