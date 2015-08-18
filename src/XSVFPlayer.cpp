@@ -6,7 +6,6 @@
 
 XSVFPlayer::XSVFPlayer(SerialComm &s)
 : m_serial_comm(s)
-, m_current_state(0)
 , m_next_state(0)
 , m_sirsize_bits(0)
 , m_sirsize_bytes(0)

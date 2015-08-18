@@ -12,7 +12,6 @@ class XSVFPlayer
 private:
 	SerialComm &m_serial_comm;
 
-	uint8_t m_current_state;
 	uint8_t m_next_state;
 	uint16_t m_sirsize_bits;
 	uint16_t m_sirsize_bytes;
@@ -110,9 +109,6 @@ protected:
 	const __FlashStringHelper *instruction_name(uint8_t instruction);
 	const __FlashStringHelper *state_name(uint8_t state);
 	
-	uint8_t currentState() const { return m_current_state; }
-	void setCurrentState(uint8_t n) { m_current_state = n; }
-
 	uint8_t nextState() const { return m_next_state; }
 	void setNextState(uint8_t n) { m_next_state = n; }
 

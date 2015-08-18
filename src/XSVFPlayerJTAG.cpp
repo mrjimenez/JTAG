@@ -5,6 +5,7 @@ XSVFPlayerJTAG::XSVFPlayerJTAG(SerialComm &s, JTAGPort &j)
 : XSVFPlayer(s)
 , m_serial_comm(s)
 , m_jtag_tap(s, j)
+, m_current_state(0)
 {
 }
 
