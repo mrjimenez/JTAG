@@ -38,6 +38,8 @@ private:
 	uint8_t m_data_mask[S_MAX_CHAIN_SIZE_BYTES];
 
 	uint16_t m_instruction_counter;
+        uint32_t m_stream_sum;
+        uint8_t m_error_code;
 
 	// The following maximum buffer size has been tested to be an exact
 	// value. If you change any program messages or strings, with debug
@@ -46,7 +48,7 @@ private:
 	static const uint32_t S_STRING_BUFFER_SIZE = 23;
 	char m_string_buffer[S_STRING_BUFFER_SIZE];
 
-	enum
+	enum e_XSVF_Instruction
 	{
 		XCOMPLETE = 0,
 		XTDOMASK,
@@ -76,11 +78,50 @@ private:
 
         SerialComm &serialComm() { return m_serial_comm; }
 
+	// All bytes must pass through this function
+	uint8_t nextByte()
+	{
+		int c = serialComm().nextByte();
+		if (c != -1) {
+			addStreamSum(c);
+		} else {
+			serialComm().Quit(ERR_SERIAL_PORT_TIMEOUT,
+				F("Serial port timeout!"));
+		}
+
+		return static_cast<uint8_t>(c);
+	}
+
+	// Returns the next byte from the stream.
+	uint8_t getNextByte();
+
+	// Returns the next word from the stream.
+	uint16_t getNextWord();
+
+	// Returns the next double word from the stream.
+	uint32_t getNextLong();
+	
+	// Stores the next count bytes from the stream into data.
+	void getNextBytes(uint8_t *data, uint32_t count);
+
+	const __FlashStringHelper *error_message(int error_code);
+
 public:
+	enum e_Error_Code
+	{
+		ERR_NO_ERROR = 0,
+		//
+		ERR_SERIAL_PORT_TIMEOUT = -1,
+		//
+		ERR_VREF_NOT_PRESENT = -10,
+		//
+		ERR_XCOMPLETE_NOT_REACHED = -100,
+		ERR_DR_CHECK_FAILED = -101,
+	};
 
 	XSVFPlayer(SerialComm &s);
 	
-	~XSVFPlayer() {}
+	~XSVFPlayer();
 
 	bool reached_xcomplete() const { return xcomplete(); }
 
@@ -167,6 +208,12 @@ protected:
 
 	uint16_t instructionCounter() const { return m_instruction_counter; }
 	uint16_t incrementInstructionCounter() { ++m_instruction_counter; }
+
+	uint32_t streamSum() const { return m_stream_sum; }
+	void addStreamSum(uint8_t n) { m_stream_sum += n; }
+
+	uint8_t errorCode() const { return m_error_code; }
+	void setErrorCode(uint8_t n) { m_error_code = n; }
 
 	/*
 	 * XSVF instruction decoders

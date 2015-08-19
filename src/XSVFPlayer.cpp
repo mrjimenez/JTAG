@@ -1,7 +1,9 @@
 
 #include <XSVFPlayer.h>
 
-#define NAME_FOR(x) case x: return (F(#x));
+#define ERR_MSG(x,y) case x: { ret = y; break; }
+#define NAME_FOR(x) case x: return F(#x);
+#define NAME_FOR_STATE(x) case STATE_##x: return F(#x);
 #define DECODE(x) case x: if (decode_##x()) { return execute_##x(); };
 
 XSVFPlayer::XSVFPlayer(SerialComm &s)
@@ -19,8 +21,79 @@ XSVFPlayer::XSVFPlayer(SerialComm &s)
 , m_enddr_state(STATE_RUN_TEST_IDLE)
 , m_xcomplete(false)
 , m_instruction_counter(0)
+, m_stream_sum(0)
+, m_error_code(ERR_NO_ERROR)
 {
 	serialComm().ask_for_data();
+}
+
+XSVFPlayer::~XSVFPlayer()
+{
+	uint8_t checksum = (-streamSum()) & 0xFF;
+	serialComm().Important(F("Checksum:  0x%02X/%lu."),
+		checksum, serialComm().streamCount());
+	serialComm().Important(F("Sum: 0x%08lX/%lu."),
+		streamSum(), serialComm().streamCount());
+	if (errorCode() == ERR_NO_ERROR && !xcomplete()) {
+		setErrorCode(ERR_XCOMPLETE_NOT_REACHED);
+	}
+	serialComm().Quit(errorCode(), error_message(errorCode()));
+}
+
+uint8_t XSVFPlayer::getNextByte()
+{
+	uint8_t i = nextByte();
+	serialComm().Debug(F(".    BYTE:%12u - 0x%02X"), i, i);
+	
+	return i;
+}
+
+uint16_t XSVFPlayer::getNextWord()
+{
+	uint16_t i = 0;
+	i  = ((uint16_t)nextByte()) << 8;
+	i |= ((uint16_t)nextByte());
+	serialComm().Debug(F(".    WORD:12%u - 0x%04X"), i, i);
+
+	return i;
+}
+
+uint32_t XSVFPlayer::getNextLong()
+{
+	uint32_t i = 0;
+	i  = ((uint32_t)nextByte()) << 24;
+	i |= ((uint32_t)nextByte()) << 16;
+	i |= ((uint32_t)nextByte()) << 8;
+	i |= ((uint32_t)nextByte());
+	serialComm().Debug(F(".   DWORD:%12lu - 0x%08lX"), i, i);
+
+	return i;
+}
+
+void XSVFPlayer::getNextBytes(uint8_t *data, uint32_t count)
+{
+	serialComm().DebugStartMessage();
+	serialComm().DebugContMessage(F(".     HEX:"));
+	while (count--) {
+		uint8_t c = nextByte();
+		serialComm().DebugContMessage(F(" %02X"), c);
+		*data++ = c;
+	}
+	serialComm().DebugContMessage(F("\n"));
+}
+
+const __FlashStringHelper *XSVFPlayer::error_message(int error_code)
+{
+	const __FlashStringHelper *ret = F("Unknown error message");
+	switch (error_code) {
+		ERR_MSG(ERR_NO_ERROR, F("No error"));
+		ERR_MSG(ERR_SERIAL_PORT_TIMEOUT, F("Serial port timeout"));
+		ERR_MSG(ERR_VREF_NOT_PRESENT, F("VRef not present"));
+		ERR_MSG(ERR_XCOMPLETE_NOT_REACHED, F("XCOMPLETE not reached"));
+		ERR_MSG(ERR_DR_CHECK_FAILED, F("DR check failed"));
+	}
+
+	return ret;
 }
 
 /*
@@ -29,7 +102,7 @@ XSVFPlayer::XSVFPlayer(SerialComm &s)
  */
 bool XSVFPlayer::handle_next_instruction()
 {
-	uint8_t instruction = serialComm().getNextByte();
+	uint8_t instruction = getNextByte();
 	incrementInstructionCounter();
 	setStringBuffer(instruction_name(instruction));
 	serialComm().Debug(F("%d - Handling %s(0x%02X)"),
@@ -107,22 +180,22 @@ const __FlashStringHelper *XSVFPlayer::instruction_name(uint8_t instruction)
 const __FlashStringHelper *XSVFPlayer::state_name(uint8_t state)
 {
 	switch (state) {
-		NAME_FOR(STATE_TEST_LOGIC_RESET);
-		NAME_FOR(STATE_RUN_TEST_IDLE);
-		NAME_FOR(STATE_SELECT_DR_SCAN);
-		NAME_FOR(STATE_CAPTURE_DR);
-		NAME_FOR(STATE_SHIFT_DR);
-		NAME_FOR(STATE_EXIT1_DR);
-		NAME_FOR(STATE_PAUSE_DR);
-		NAME_FOR(STATE_EXIT2_DR);
-		NAME_FOR(STATE_UPDATE_DR);
-		NAME_FOR(STATE_SELECT_IR_SCAN);
-		NAME_FOR(STATE_CAPTURE_IR);
-		NAME_FOR(STATE_SHIFT_IR);
-		NAME_FOR(STATE_EXIT1_IR);
-		NAME_FOR(STATE_PAUSE_IR);
-		NAME_FOR(STATE_EXIT2_IR);
-		NAME_FOR(STATE_UPDATE_IR);
+		NAME_FOR_STATE(TEST_LOGIC_RESET);
+		NAME_FOR_STATE(RUN_TEST_IDLE);
+		NAME_FOR_STATE(SELECT_DR_SCAN);
+		NAME_FOR_STATE(CAPTURE_DR);
+		NAME_FOR_STATE(SHIFT_DR);
+		NAME_FOR_STATE(EXIT1_DR);
+		NAME_FOR_STATE(PAUSE_DR);
+		NAME_FOR_STATE(EXIT2_DR);
+		NAME_FOR_STATE(UPDATE_DR);
+		NAME_FOR_STATE(SELECT_IR_SCAN);
+		NAME_FOR_STATE(CAPTURE_IR);
+		NAME_FOR_STATE(SHIFT_IR);
+		NAME_FOR_STATE(EXIT1_IR);
+		NAME_FOR_STATE(PAUSE_IR);
+		NAME_FOR_STATE(EXIT2_IR);
+		NAME_FOR_STATE(UPDATE_IR);
 	default:
 		return F("UNKNOWN_STATE");
 	}
@@ -131,14 +204,13 @@ const __FlashStringHelper *XSVFPlayer::state_name(uint8_t state)
 bool XSVFPlayer::decode_XCOMPLETE()
 {
 	setXcomplete(true);
-	serialComm().Important(F("XCOMPLETE"));
 
 	return true;
 }
 
 bool XSVFPlayer::decode_XTDOMASK()
 {
-	serialComm().getNextBytes(tdoMask(), sdrsizeBytes());
+	getNextBytes(tdoMask(), sdrsizeBytes());
 	serialComm().DebugBytes(F("... TDO mask set to"),
 		tdoMask(), sdrsizeBytes());
 
@@ -147,7 +219,7 @@ bool XSVFPlayer::decode_XTDOMASK()
 
 bool XSVFPlayer::decode_XSIR()
 {
-	setSirsizeBits(serialComm().getNextByte());
+	setSirsizeBits(getNextByte());
 	if (sirsizeBytes() > S_MAX_CHAIN_SIZE_BYTES) {
 		serialComm().Important(
 			F("Requested IR size (%d bits) is greater than the maximum chain"
@@ -155,21 +227,21 @@ bool XSVFPlayer::decode_XSIR()
 			sirsizeBits(), S_MAX_CHAIN_SIZE_BITS);
 		return false;
 	}
-	serialComm().getNextBytes(tdi(), sirsizeBytes());
+	getNextBytes(tdi(), sirsizeBytes());
 
 	return true;
 }
 
 bool XSVFPlayer::decode_XSDR()
 {
-	serialComm().getNextBytes(tdi(), sdrsizeBytes());
+	getNextBytes(tdi(), sdrsizeBytes());
 
 	return true;
 }
 
 bool XSVFPlayer::decode_XRUNTEST()
 {
-	setRuntest(serialComm().getNextLong());
+	setRuntest(getNextLong());
 	serialComm().Debug(F("... runtest set to %ld"), runtest());
 
 	return true;
@@ -187,7 +259,7 @@ bool XSVFPlayer::decode_XRESERVED_6()
 
 bool XSVFPlayer::decode_XREPEAT()
 {
-	setRepeat(serialComm().getNextByte());
+	setRepeat(getNextByte());
 	serialComm().Debug(F("... repeat set to %d"), repeat());
 
 	return true;
@@ -195,7 +267,7 @@ bool XSVFPlayer::decode_XREPEAT()
 
 bool XSVFPlayer::decode_XSDRSIZE()
 {
-	setSdrSizeBits(serialComm().getNextLong());
+	setSdrSizeBits(getNextLong());
 	if (sdrsizeBytes() > S_MAX_CHAIN_SIZE_BYTES) {
 		serialComm().Important(
 			F("Requested DR size (%lu bits) is greater than the maximum chain"
@@ -211,16 +283,16 @@ bool XSVFPlayer::decode_XSDRSIZE()
 
 bool XSVFPlayer::decode_XSDRTDO()
 {
-	serialComm().getNextBytes(tdi(), sdrsizeBytes());
-	serialComm().getNextBytes(tdoExpected(), sdrsizeBytes());
+	getNextBytes(tdi(), sdrsizeBytes());
+	getNextBytes(tdoExpected(), sdrsizeBytes());
 
 	return true;
 }
 
 bool XSVFPlayer::decode_XSETSDRMASKS()
 {
-	serialComm().getNextBytes(addressMask(), sdrsizeBytes());
-	serialComm().getNextBytes(dataMask(), sdrsizeBytes());
+	getNextBytes(addressMask(), sdrsizeBytes());
+	getNextBytes(dataMask(), sdrsizeBytes());
 	
 	return true;
 }
@@ -231,52 +303,52 @@ bool XSVFPlayer::decode_XSETSDRMASKS()
 
 bool XSVFPlayer::decode_XSDRB()
 {
-	serialComm().getNextBytes(tdi(), sdrsizeBytes());
+	getNextBytes(tdi(), sdrsizeBytes());
 
 	return true;
 }
 
 bool XSVFPlayer::decode_XSDRC()
 {
-	serialComm().getNextBytes(tdi(), sdrsizeBytes());
+	getNextBytes(tdi(), sdrsizeBytes());
 
 	return true;
 }
 
 bool XSVFPlayer::decode_XSDRE()
 {
-	serialComm().getNextBytes(tdi(), sdrsizeBytes());
+	getNextBytes(tdi(), sdrsizeBytes());
 
 	return true;
 }
 
 bool XSVFPlayer::decode_XSDRTDOB()
 {
-	serialComm().getNextBytes(tdi(), sdrsizeBytes());
-	serialComm().getNextBytes(tdoExpected(), sdrsizeBytes());
+	getNextBytes(tdi(), sdrsizeBytes());
+	getNextBytes(tdoExpected(), sdrsizeBytes());
 
 	return true;
 }
 
 bool XSVFPlayer::decode_XSDRTDOC()
 {
-	serialComm().getNextBytes(tdi(), sdrsizeBytes());
-	serialComm().getNextBytes(tdoExpected(), sdrsizeBytes());
+	getNextBytes(tdi(), sdrsizeBytes());
+	getNextBytes(tdoExpected(), sdrsizeBytes());
 
 	return true;
 }
 
 bool XSVFPlayer::decode_XSDRTDOE()
 {
-	serialComm().getNextBytes(tdi(), sdrsizeBytes());
-	serialComm().getNextBytes(tdoExpected(), sdrsizeBytes());
+	getNextBytes(tdi(), sdrsizeBytes());
+	getNextBytes(tdoExpected(), sdrsizeBytes());
 
 	return true;
 }
 
 bool XSVFPlayer::decode_XSTATE()
 {
-	setNextState(serialComm().getNextByte());
+	setNextState(getNextByte());
 
 	return true;
 }
@@ -284,7 +356,7 @@ bool XSVFPlayer::decode_XSTATE()
 bool XSVFPlayer::decode_XENDIR()
 {
 	bool ret = true;
-	uint8_t s = serialComm().getNextByte();
+	uint8_t s = getNextByte();
 	switch (s) {
 	case 0:
 		setEndirState(STATE_RUN_TEST_IDLE);
@@ -307,7 +379,7 @@ bool XSVFPlayer::decode_XENDIR()
 bool XSVFPlayer::decode_XENDDR()
 {
 	bool ret = true;
-	uint8_t s = serialComm().getNextByte();
+	uint8_t s = getNextByte();
 	switch (s) {
 	case 0:
 		setEnddrState(STATE_RUN_TEST_IDLE);
@@ -329,8 +401,8 @@ bool XSVFPlayer::decode_XENDDR()
 
 bool XSVFPlayer::decode_XSIR2()
 {
-	setSirsizeBits(serialComm().getNextWord());
-	serialComm().getNextBytes(tdi(), sirsizeBytes());
+	setSirsizeBits(getNextWord());
+	getNextBytes(tdi(), sirsizeBytes());
 
 	return true;
 }
@@ -340,7 +412,7 @@ bool XSVFPlayer::decode_XCOMMENT()
 	serialComm().DebugStartMessage();
 	serialComm().DebugContMessage(F("XCOMMENT:"));
 	uint8_t c;
-	while (c = serialComm().getNextByte()) {
+	while (c = getNextByte()) {
 		serialComm().DebugContMessage(F("%c"), c);
 		execute_XCOMMENT_auxiliar(c);
 	}
@@ -352,9 +424,9 @@ bool XSVFPlayer::decode_XCOMMENT()
 
 bool XSVFPlayer::decode_XWAIT()
 {
-	setWaitStartState(serialComm().getNextByte());
-	setWaitEndState(serialComm().getNextByte());
-	setWaitTimeUsecs(serialComm().getNextLong());
+	setWaitStartState(getNextByte());
+	setWaitEndState(getNextByte());
+	setWaitTimeUsecs(getNextLong());
 
 	return true;
 }

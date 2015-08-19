@@ -25,7 +25,6 @@ SerialComm::SerialComm(Stream &s, int stream_buffer_size)
 //, m_stream_buffer_threshold(m_stream_buffer_capacity *  1 / 16) //  6.37 s
 //, m_stream_buffer_threshold(1)                                  // 22.81 s
 , m_stream_buffer_checkpoint(0)
-, m_stream_sum(0)
 , m_stream_count(0)
 {
 	if (streamBufferThreshold() == 0) {
@@ -39,10 +38,6 @@ SerialComm::SerialComm(Stream &s, int stream_buffer_size)
 
 SerialComm::~SerialComm()
 {
-	uint8_t checksum = (-streamSum()) & 0xFF;
-	Important(F("Checksum:  0x%02X/%lu."), checksum, streamCount());
-	Important(F("Sum: 0x%08lX/%lu."), streamSum(), streamCount());
-	Quit(F("Exiting!"));
 }
 
 void SerialComm::ask_for_data()
@@ -51,48 +46,6 @@ void SerialComm::ask_for_data()
 		checkAndRequestData(true);
 		setAlreadyAsked();
 	}
-}
-
-uint8_t SerialComm::getNextByte()
-{
-	uint8_t i = nextByte();
-	Debug(F(".    BYTE:%12u - 0x%02X"), i, i);
-	
-	return i;
-}
-
-uint16_t SerialComm::getNextWord()
-{
-	uint16_t i = 0;
-	i  = ((uint16_t)nextByte()) << 8;
-	i |= ((uint16_t)nextByte());
-	Debug(F(".    WORD:12%u - 0x%04X"), i, i);
-
-	return i;
-}
-
-uint32_t SerialComm::getNextLong()
-{
-	uint32_t i = 0;
-	i  = ((uint32_t)nextByte()) << 24;
-	i |= ((uint32_t)nextByte()) << 16;
-	i |= ((uint32_t)nextByte()) << 8;
-	i |= ((uint32_t)nextByte());
-	Debug(F(".   DWORD:%12lu - 0x%08lX"), i, i);
-
-	return i;
-}
-
-void SerialComm::getNextBytes(uint8_t *data, uint32_t count)
-{
-	DebugStartMessage();
-	DebugContMessage(F(".     HEX:"));
-	while (count--) {
-		uint8_t c = nextByte();
-		DebugContMessage(F(" %02X"), c);
-		*data++ = c;
-	}
-	DebugContMessage(F("\n"));
 }
 
 void SerialComm::Important(const __FlashStringHelper *ifsh, ...)
@@ -126,7 +79,7 @@ void SerialComm::checkAndRequestData(bool force)
 	}
 }
 
-uint8_t SerialComm::nextByte()
+int SerialComm::nextByte()
 {
 	// Wait for TIMEOUT milliseconds if the buffer is empty.
 	//unsigned const int TIMEOUT = 1000; // milliseconds
@@ -135,11 +88,10 @@ uint8_t SerialComm::nextByte()
         while (serial().available() <= 0 && millis() < end_time) {
         }
         // Return an invalid instruction
-	uint8_t c = -1;
+	int c = -1;
 	int n = serial().available();
 	if (n > 0) {
 		c = serial().read();
-		addStreamSum(c);
 		incStreamCount();
 		checkAndRequestData();
 	} else {
@@ -147,7 +99,6 @@ uint8_t SerialComm::nextByte()
 			streamCount(), streamBufferThreshold(),
 			streamCount() % streamBufferCapacity(),
 			n);
-		Quit(F("Serial port timeout!"));
 	}
 
 	return c;
@@ -243,9 +194,11 @@ void SerialComm::Ready(const __FlashStringHelper *message) const
 	serial().println(message);
 }
 
-void SerialComm::Quit(const __FlashStringHelper *message) const
+void SerialComm::Quit(int error_code, const __FlashStringHelper *message) const
 {
 	serial().print(F("\r\nQ"));
+	serial().print(error_code);
+	serial().print(F(","));
 	serial().println(message);
 }
 

@@ -47,6 +47,16 @@ class Uploader(object):
         self._sum = 0
         # To compute the elapsed time
         self._start_time = 0
+        # Error code
+        self._error_code = 0
+
+    @property
+    def error_code(self):
+        return self._error_code
+
+    @error_code.setter
+    def error_code(self, value):
+        self._error_code = value
 
     def reset_arduino(self):
         """Resets the arduino and clear any garbage on the serial port."""
@@ -60,7 +70,7 @@ class Uploader(object):
     def print_lf(self):
         if self._need_lf:
             self._need_lf = False
-            print()
+            print
 
     def initialize_hashes(self):
         self._sum = 0
@@ -106,9 +116,14 @@ class Uploader(object):
                 self._start_time = time.time()
             elif command == 'Q':
                 self.print_lf()
-                print 'Received device quit:', argument
+                # Split the argument. The first field is the error code,
+                # the next field is the error message.
+                args = argument.split(',')
+                self.error_code = int(args[0])
+                print 'Quit: {1:s} ({0:d}).'.format(
+                    self.error_code, args[1])
                 self.print_hashes()
-                return True
+                return self.error_code == 0
             elif command == 'D':
                 self.print_lf()
                 print 'Device:', argument

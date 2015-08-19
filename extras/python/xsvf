@@ -31,15 +31,17 @@ my_parser.add_argument(
 
 def main():
     ok = False
+    error_code = -1;
     Uploader.Uploader.add_arguments(my_parser)
     args = my_parser.parse_args()
     if args.command == 'upload':
         u = Uploader.Uploader(args.port, args.baud)
         ok = u.upload_all_files(args.fileName)
+        error_code = u.error_code
     elif args.command == 'disasm':
         d = XSVFDisassembler.XSVFDisassembler()
-        ok = d.disasm_all_files(args.fileName)
-    sys.exit(ok)
+        error_code = d.disasm_all_files(args.fileName)
+    sys.exit(error_code)
 
 if __name__ == '__main__':
     main()

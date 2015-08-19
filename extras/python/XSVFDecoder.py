@@ -40,6 +40,7 @@ class XSVFDecoder(object):
         return (n + 7) >> 3
 
     def __init__(self):
+        self._error_code = 0
         self._iter_file = None
         #
         self._next_state = 0
@@ -73,6 +74,14 @@ class XSVFDecoder(object):
 
 
     #
+    @property
+    def error_code(self):
+        return self._error_code
+
+    @error_code.setter
+    def error_code(self, value):
+        self._error_code = value
+
     @property
     def next_state(self):
         """The next state to go to."""
@@ -359,6 +368,7 @@ class XSVFDecoder(object):
         return True
 
     def decode_xsdrinc(self):
+        self.error_code = -1
         return False
 
     def decode_xsdrb(self):
@@ -400,6 +410,7 @@ class XSVFDecoder(object):
         elif s == 1:
             self.endir_state = JTAGTAP.JTAGTAP.PAUSE_IR
         else:
+            self.error_code = -2
             ret = False
             print "Invalid XENDIR parameter %d" % s
         return ret
@@ -412,6 +423,7 @@ class XSVFDecoder(object):
         elif s == 1:
             self.enddr_state = JTAGTAP.JTAGTAP.PAUSE_DR
         else:
+            self.error_code = -3
             ret = False
             print "Invalid XENDDR parameter %d" % s
         return ret

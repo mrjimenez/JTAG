@@ -192,10 +192,10 @@ bool XSVFPlayerJTAG::sdr(bool must_begin, bool must_check, bool must_end)
 		}
 	}
 	if (must_check && !matched) {
-		serialComm().Important(F("SDR check failed!"));
-		return false;
+		setErrorCode(ERR_DR_CHECK_FAILED);
+		serialComm().Important(F("DR check failed!"));
 	}
-	if (must_end) {
+	if (must_end && matched) {
 		if (!runtest()) {
 			state_goto(enddrState());
 		} else {
@@ -204,7 +204,7 @@ bool XSVFPlayerJTAG::sdr(bool must_begin, bool must_check, bool must_end)
 		}
 	}
 
-	return true;
+	return matched;
 }
 
 bool XSVFPlayerJTAG::is_tdo_as_expected()

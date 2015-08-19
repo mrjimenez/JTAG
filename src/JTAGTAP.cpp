@@ -96,7 +96,8 @@ JTAGTAP::JTAGTAP(SerialComm &s, JTAGPort &j)
 , m_current_state(STATE_TEST_LOGIC_RESET)
 {
 	if (!jtagPort().read_vref()) {
-		serialComm().Quit(F("VREF is not present. Please, check the cable."));
+		serialComm().Quit(-10,
+			F("VREF is not present. Please, check the cable."));
 	}
 }
 
