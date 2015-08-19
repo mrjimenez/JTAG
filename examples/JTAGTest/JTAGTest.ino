@@ -27,7 +27,7 @@ void loop()
 	
 	uint32_t n = 0;
 	while (true) {
-		//p.test_xsir(2);
+		//p.test_code(2);
 		++n;
 		if (!p.handle_next_instruction()) {
 			if (!p.reached_xcomplete()) {
