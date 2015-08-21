@@ -61,6 +61,16 @@ void SerialComm::Important(const __FlashStringHelper *ifsh, ...)
 	serial().println(tmp);
 }
 
+void SerialComm::ImportantBits(const __FlashStringHelper *msg, const uint8_t *pb, uint32_t count_bits)
+{
+	uint32_t count_bytes = (count_bits + 7) >> 3;
+	serial().print(msg);
+	print_bytes(pb, count_bytes);
+	serial().print(F("/"));
+	serial().print(count_bits);
+	serial().println(F(" bits"));
+}
+
 void SerialComm::checkAndRequestData(bool force)
 {
 	if (force ||

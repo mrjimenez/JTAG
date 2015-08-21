@@ -19,6 +19,9 @@
 *.lzo
 *.patch
 
+core
+core.*
+
 #
 # Backup files
 #

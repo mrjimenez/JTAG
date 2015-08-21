@@ -28,7 +28,7 @@ bool XSVFPlayerJTAG::execute_XSIR()
 
 bool XSVFPlayerJTAG::execute_XSDR()
 {
-	return sdr(true, true, true);
+	return sdr(true, true, true, true);
 }
 
 bool XSVFPlayerJTAG::execute_XRUNTEST()
@@ -58,7 +58,7 @@ bool XSVFPlayerJTAG::execute_XSDRSIZE()
 
 bool XSVFPlayerJTAG::execute_XSDRTDO()
 {
-	return sdr(true, true, true);
+	return sdr(true, true, true, true);
 }
 
 bool XSVFPlayerJTAG::execute_XSETSDRMASKS()
@@ -73,32 +73,32 @@ bool XSVFPlayerJTAG::execute_XSDRINC()
 
 bool XSVFPlayerJTAG::execute_XSDRB()
 {
-	return sdr(true, false, false);
+	return sdr(true, false, false, false);
 }
 
 bool XSVFPlayerJTAG::execute_XSDRC()
 {
-	return sdr(false, true, false);
+	return sdr(false, false, false, false);
 }
 
 bool XSVFPlayerJTAG::execute_XSDRE()
 {
-	return sdr(false, false, true);
+	return sdr(false, false, false, true);
 }
 
 bool XSVFPlayerJTAG::execute_XSDRTDOB()
 {
-	return sdr(true, false, false);
+	return sdr(true, true, false, false);
 }
 
 bool XSVFPlayerJTAG::execute_XSDRTDOC()
 {
-	return sdr(false, true, false);
+	return sdr(false, true, false, false);
 }
 
 bool XSVFPlayerJTAG::execute_XSDRTDOE()
 {
-	return sdr(false, false, true);
+	return sdr(false, true, false, true);
 }
 
 bool XSVFPlayerJTAG::execute_XSTATE()
@@ -163,7 +163,7 @@ void XSVFPlayerJTAG::sir()
 	}
 }
 
-bool XSVFPlayerJTAG::sdr(bool must_begin, bool must_check, bool must_end)
+bool XSVFPlayerJTAG::sdr(bool must_begin, bool must_check, bool use_mask, bool must_end)
 {
 	int attempts_left = repeat();
 	bool matched = false;
@@ -174,20 +174,21 @@ bool XSVFPlayerJTAG::sdr(bool must_begin, bool must_check, bool must_end)
 	while (!matched && attempts_left-- >= 0) {
 		serialComm().Debug(F("... shifting into DR"));
 		jtagTap().shift_td(tdi(), tdo(), sdrsizeBits(), must_end);
-		if (must_check) {
-			matched = is_tdo_as_expected();
-			if (!matched) {
-				// XAP058, page 14
-				state_goto(STATE_PAUSE_DR);
-				state_goto(STATE_SHIFT_DR);
-				state_goto(STATE_RUN_TEST_IDLE);
-				jtagTap().wait_time(runtest());
-				//
-				state_goto(STATE_SHIFT_DR);
-				if (attempts_left >= 0) {
-					serialComm().Debug(F("...... repeating: %d"),
-						repeat() - attempts_left);
-				}
+		if (!must_check) {
+			break;
+		}
+		matched = is_tdo_as_expected(use_mask);
+		if (!matched) {
+			// XAP058, page 14
+			state_goto(STATE_PAUSE_DR);
+			state_goto(STATE_SHIFT_DR);
+			state_goto(STATE_RUN_TEST_IDLE);
+			jtagTap().wait_time(runtest());
+			//
+			state_goto(STATE_SHIFT_DR);
+			if (attempts_left >= 0) {
+				serialComm().Debug(F("...... repeating: %d"),
+					repeat() - attempts_left);
 			}
 		}
 	}
@@ -207,7 +208,7 @@ bool XSVFPlayerJTAG::sdr(bool must_begin, bool must_check, bool must_end)
 	return matched;
 }
 
-bool XSVFPlayerJTAG::is_tdo_as_expected()
+bool XSVFPlayerJTAG::is_tdo_as_expected(bool use_mask)
 {
 	serialComm().DebugBytes(F("... TDO mask: "),
 		tdoMask(), sdrsizeBytes());
@@ -215,8 +216,12 @@ bool XSVFPlayerJTAG::is_tdo_as_expected()
 		tdoExpected(), sdrsizeBytes());
 	serialComm().DebugBytes(F("... received: "), tdo(), sdrsizeBytes());
 	for (int i = 0; i < sdrsizeBytes(); ++i) {
-		uint8_t expected = tdoExpected()[i] & tdoMask()[i];
-		uint8_t actual = tdo()[i] & tdoMask()[i];
+		uint8_t expected = tdoExpected()[i];
+		uint8_t actual = tdo()[i];
+		if (use_mask) {
+			expected &= tdoMask()[i];
+			actual &= tdoMask()[i];
+		}
 		if (expected != actual) {
 			serialComm().Debug(F("... NO MATCH!"));
 			return false;
@@ -246,7 +251,7 @@ void XSVFPlayerJTAG::test_code(int i)
 			setSdrSizeBits(0x20);
 			*((uint32_t *)tdi()) = 0;
 			*((uint32_t *)tdoExpected()) = 0x93F0E5F6;
-			sdr(true, true, true);
+			sdr(true, true, true, true);
 			//
 			uint32_t microseconds = 1000;
 			uint32_t until = micros() + microseconds;
@@ -255,7 +260,7 @@ void XSVFPlayerJTAG::test_code(int i)
 			break;
 		}
 		case 2:
-			sdr(true, true, true);
+			sdr(true, true, true, true);
 			break;
 		}
 	}

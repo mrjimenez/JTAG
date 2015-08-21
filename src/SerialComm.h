@@ -4,7 +4,7 @@
 
 #include <Arduino.h>
 
-#define DEBUG 0
+#define DEBUG 1
 
 class SerialComm
 {
@@ -58,7 +58,9 @@ public:
 	uint32_t streamCount() const { return m_stream_count; }
 
 	void Important(const __FlashStringHelper *fmt, ...);
+	void ImportantBits(const __FlashStringHelper *msg, const uint8_t *pb, uint32_t count_bits);
 	void Quit(int error_code, const __FlashStringHelper *message) const;
+	void print_bytes(const uint8_t *pb, uint32_t count, bool lf = false);
 
 	void DebugStartMessage() const;
 	void DebugContMessage(const __FlashStringHelper *ifsh, ...);
@@ -74,7 +76,6 @@ private:
 	const char *format(const char *fmt, va_list args);
 	void Ready(const char *message) const;
 	void Ready(const __FlashStringHelper *message) const;
-	void print_bytes(const uint8_t *pb, uint32_t count, bool lf = false);
 };
 
 #endif  // SERIALCOMM_H

@@ -96,6 +96,12 @@ const __FlashStringHelper *XSVFPlayer::error_message(int error_code)
 	return ret;
 }
 
+void XSVFPlayer::print_last_tdo() const
+{
+	serialComm().ImportantBits(F("!Last TDO:"),
+		last_tdo(), last_dr_size_bits());
+}
+
 /*
  * Reads the next instruction from the serial port. Also reads any
  * remaining instruction parameters into the instruction buffer.

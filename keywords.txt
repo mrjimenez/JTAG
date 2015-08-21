@@ -16,9 +16,16 @@ XSVFPlayerJTAG			KEYWORD1
 ########################################
 
 Important			KEYWORD2
+ImportantBits			KEYWORD2
+Quit				KEYWORD2
+print_bytes			KEYWORD2
 
 handle_next_instruction		KEYWORD2
 reached_xcomplete		KEYWORD2
+last_dr_size_bits		KEYWORD2
+last_dr_size_bytes		KEYWORD2
+last_tdo			KEYWORD2
+print_last_tdo			KEYWORD2
 
 shift_td			KEYWORD2
 state_goto			KEYWORD2

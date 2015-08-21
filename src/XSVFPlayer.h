@@ -77,6 +77,7 @@ private:
 	};
 
         SerialComm &serialComm() { return m_serial_comm; }
+	SerialComm &serialComm() const { return m_serial_comm; }
 
 	// All bytes must pass through this function
 	uint8_t nextByte()
@@ -125,6 +126,14 @@ public:
 
 	bool reached_xcomplete() const { return xcomplete(); }
 
+	uint32_t last_dr_size_bits() const { return sdrsizeBits(); }
+
+	uint32_t last_dr_size_bytes() const { return sdrsizeBytes(); }
+
+	const uint8_t *last_tdo() const { return m_tdo; }
+
+	void print_last_tdo() const;
+
 	bool handle_next_instruction();
 
 	static uint32_t numBytes(uint32_t numBits)
@@ -139,7 +148,7 @@ protected:
 		PGM_P p = reinterpret_cast<PGM_P>(s);
 		size_t n = strlen_P(p);
 		if (n > S_STRING_BUFFER_SIZE - 1) {
-			m_serial_comm.Debug(
+			serialComm().Debug(
 				F(">>>>>>>>>>>> String truncated by %d bytes."),
 				n - S_STRING_BUFFER_SIZE + 1);
 		}
@@ -200,6 +209,7 @@ protected:
 
 	uint8_t *tdi() { return m_tdi; }
 	uint8_t *tdo() { return m_tdo; }
+	const uint8_t *tdo() const { return m_tdo; }
 	uint8_t *tdoMask() { return m_tdo_mask; }
 	uint8_t *tdoExpected() { return m_tdo_expected; }
 
