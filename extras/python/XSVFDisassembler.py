@@ -56,7 +56,7 @@ class XSVFDisassembler(XSVFDecoder.XSVFDecoder):
 
     def return_zeroeth(self, l):
         if l:
-            l_0 = l[0].strip()
+            l_0 = l[0].rstrip()
         else:
             l_0 = ""
         return l_0
