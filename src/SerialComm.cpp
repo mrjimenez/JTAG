@@ -1,6 +1,13 @@
 
 #include <SerialComm.h>
 
+#ifdef __AVR__
+	#define PLATFORM_VSNPRINTF(...) vsnprintf_P(__VA_ARGS__)
+#else
+	#define PLATFORM_VSNPRINTF(...) vsnprintf(__VA_ARGS__)
+#endif
+
+
 SerialComm::SerialComm(Stream &s, int stream_buffer_size)
 : m_serial(s)
 , m_already_asked(false)
@@ -50,18 +57,18 @@ void SerialComm::ask_for_data()
 
 void SerialComm::Important(const __FlashStringHelper *ifsh, ...)
 {
-	CopyToFlashBuffer(ifsh);
-
 	va_list args;
 	va_start(args, ifsh);
-	const char *tmp = format(flashBuffer(), args);
+	PLATFORM_VSNPRINTF(formatBuffer(), S_FORMAT_BUFFER_SIZE,
+		(const char *)ifsh, args);
 	va_end(args);
 
 	serial().print(F("!"));
-	serial().println(tmp);
+	serial().println(formatBuffer());
 }
 
-void SerialComm::ImportantBits(const __FlashStringHelper *msg, const uint8_t *pb, uint32_t count_bits)
+void SerialComm::ImportantBits(const __FlashStringHelper *msg, const uint8_t *pb,
+	uint32_t count_bits)
 {
 	uint32_t count_bytes = (count_bits + 7) >> 3;
 	serial().print(msg);
@@ -114,6 +121,8 @@ int SerialComm::nextByte()
 	return c;
 }
 
+// Not needed, left here as example.
+#if 0
 void SerialComm::CopyToFlashBuffer(const __FlashStringHelper *ifsh)
 {
 	PGM_P p = reinterpret_cast<PGM_P>(ifsh);
@@ -135,13 +144,7 @@ void SerialComm::CopyToFlashBuffer(const __FlashStringHelper *ifsh)
 	}
 	*/
 }
-
-const char *SerialComm::format(const char *fmt, va_list args)
-{
-	vsnprintf(m_format_buffer, S_FORMAT_BUFFER_SIZE, fmt, args);
-
-	return m_format_buffer;
-}
+#endif
 
 #if DEBUG == 1
 
@@ -152,30 +155,27 @@ void SerialComm::DebugStartMessage() const
 
 void SerialComm::DebugContMessage(const __FlashStringHelper *ifsh, ...)
 {
-	CopyToFlashBuffer(ifsh);
-
 	va_list args;
 	va_start(args, ifsh);
-	const char *tmp = format(flashBuffer(), args);
+	PLATFORM_VSNPRINTF(formatBuffer(), S_FORMAT_BUFFER_SIZE,
+		(const char *)ifsh, args);
 	va_end(args);
-
-	serial().print(tmp);
+	serial().print(formatBuffer());
 }
 
 void SerialComm::Debug(const __FlashStringHelper *ifsh, ...)
 {
-	CopyToFlashBuffer(ifsh);
-
 	va_list args;
 	va_start(args, ifsh);
-	const char *tmp = format(flashBuffer(), args);
+	PLATFORM_VSNPRINTF(formatBuffer(), S_FORMAT_BUFFER_SIZE,
+		(const char *)ifsh, args);
 	va_end(args);
-
 	DebugStartMessage();
-	serial().println(tmp);
+	serial().println(formatBuffer());
 }
 
-void SerialComm::DebugBytes(const __FlashStringHelper *s, const uint8_t *b, uint8_t n)
+void SerialComm::DebugBytes(const __FlashStringHelper *s, const uint8_t *b,
+	uint8_t n)
 {
 	DebugStartMessage();
 	serial().print(s);
@@ -218,7 +218,7 @@ void SerialComm::print_bytes(const uint8_t *pb, uint32_t count, bool lf)
 	char *fmt_msg = " %02X";
 	int fmt_msg_size = 3;
 	while (count) {
-		char *f = m_format_buffer;
+		char *f = formatBuffer();
 		int buf_size = S_FORMAT_BUFFER_SIZE;
 		while (count && buf_size > 6) {
 			snprintf(f, buf_size, fmt_msg, *p);
@@ -228,13 +228,13 @@ void SerialComm::print_bytes(const uint8_t *pb, uint32_t count, bool lf)
 			count--;
 		}
 		if (count && buf_size <= 6) {
-			serial().print(m_format_buffer);
+			serial().print(formatBuffer());
 		}
 	}
 	if (lf) {
-		serial().println(m_format_buffer);
+		serial().println(formatBuffer());
 	} else {
-		serial().print(m_format_buffer);
+		serial().print(formatBuffer());
 	}
 }
 

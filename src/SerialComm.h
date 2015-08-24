@@ -9,15 +9,13 @@
 class SerialComm
 {
 private:
-	static const int S_FLASH_BUFFER_SIZE = 128 + 1;
-	static const int S_FORMAT_BUFFER_SIZE = S_FLASH_BUFFER_SIZE;
+	static const int S_FORMAT_BUFFER_SIZE = 128 + 1;
 
 	Stream &m_serial;
 
         bool m_already_asked;
 
         char m_send_msg[6];
-	char m_flash_buffer[S_FLASH_BUFFER_SIZE];
 	char m_format_buffer[S_FORMAT_BUFFER_SIZE];
 
         unsigned int m_stream_buffer_capacity;
@@ -68,12 +66,9 @@ public:
 	void DebugBytes(const __FlashStringHelper *s, const uint8_t* p, uint8_t n);
 
 private:
-	void CopyToFlashBuffer(const __FlashStringHelper *ifsh);
-	const char *flashBuffer() const { return m_flash_buffer; }
-	char *flashBuffer() { return m_flash_buffer; }
+	char *formatBuffer() { return m_format_buffer; }
 
 	void checkAndRequestData(bool force = false);
-	const char *format(const char *fmt, va_list args);
 	void Ready(const char *message) const;
 	void Ready(const __FlashStringHelper *message) const;
 };
