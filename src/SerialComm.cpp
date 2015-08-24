@@ -85,7 +85,6 @@ void SerialComm::checkAndRequestData(bool force)
 		updateCheckpoint();
 		int n = force ? streamBufferCapacity() : streamBufferThreshold();
 		snprintf(sendMsg(), sizeofSendMsg(), "S%-4d", n);
-		//Ready(sendMsg());
 		serial().print(F("\r\n"));
 		serial().println(sendMsg());
 		if (DEBUG) {
@@ -191,12 +190,6 @@ void SerialComm::Debug(const __FlashStringHelper *fmt, ...) {}
 void SerialComm::DebugBytes(const __FlashStringHelper *s, const uint8_t* p, uint8_t n) {}
 
 #endif
-
-void SerialComm::Ready(const char *message) const
-{
-	serial().print(F("\r\nR"));
-	serial().println(message);
-}
 
 void SerialComm::Ready(const __FlashStringHelper *message) const
 {

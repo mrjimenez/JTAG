@@ -69,7 +69,6 @@ private:
 	char *formatBuffer() { return m_format_buffer; }
 
 	void checkAndRequestData(bool force = false);
-	void Ready(const char *message) const;
 	void Ready(const __FlashStringHelper *message) const;
 };
 
