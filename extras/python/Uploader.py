@@ -37,8 +37,9 @@ class Uploader(object):
             help='BAUD rate'
                  ' (type %(type)s, default=%(default)s)')
 
-    def __init__(self, port, baud):
-        self._serial = serial.Serial(port=port, baudrate=baud)
+    def __init__(self, args):
+        self._serial = serial.Serial(port=args.port, baudrate=args.baud)
+        self._args = args
         # Help printing new lines
         self._need_lf = False
         #
@@ -81,8 +82,9 @@ class Uploader(object):
 
     def print_hashes(self):
         cksum = (-self._sum) & 0xFF
-        print '  Expected checksum:  0x%02X/%lu.' % (cksum, self._file_size)
-        print '  Expected sum: 0x%08lX/%lu.' % (self._sum, self._file_size)
+        if self._args.debug > 1:
+            print '  Expected checksum:  0x%02X/%lu.' % (cksum, self._file_size)
+            print '  Expected sum: 0x%08lX/%lu.' % (self._sum, self._file_size)
         if self._start_time > 0:
             print 'Elapsed time: %.02f seconds.' % \
                   (time.time() - self._start_time)
@@ -104,14 +106,16 @@ class Uploader(object):
                 self.update_hashes(xsvf_data)
                 xsvf_data += chr(0xff) * (num_bytes - len(xsvf_data))
                 self._serial.write(xsvf_data)
-                print '\rSent: %8d bytes, %8d remaining' % \
-                      (bytes_written, self._file_size - bytes_written),
-                sys.stdout.flush()
-                self._need_lf = True
+                if self._args.debug > 1:
+                    print '\rSent: %8d bytes, %8d remaining' % \
+                          (bytes_written, self._file_size - bytes_written),
+                    sys.stdout.flush()
+                    self._need_lf = True
             elif command == 'R':
                 self.initialize_hashes()
-                print 'File: %s' % os.path.realpath(fd.name)
-                print 'Ready to send %d bytes.' % self._file_size
+                if self._args.debug > 1:
+                    print 'File: %s' % os.path.realpath(fd.name)
+                    print 'Ready to send %d bytes.' % self._file_size
                 self._start_time = time.time()
             elif command == 'Q':
                 self.print_lf()
@@ -119,16 +123,19 @@ class Uploader(object):
                 # the next field is the error message.
                 args = argument.split(',')
                 self.error_code = int(args[0])
-                print 'Quit: {1:s} ({0:d}).'.format(
-                    self.error_code, args[1])
+                if self._args.debug > 1:
+                    print 'Quit: {1:s} ({0:d}).'.format(
+                        self.error_code, args[1])
                 self.print_hashes()
                 return self.error_code == 0
             elif command == 'D':
-                self.print_lf()
-                print 'Device:', argument
+                if self._args.debug > 0:
+                    self.print_lf()
+                    print 'Device:', argument
             elif command == '!':
-                self.print_lf()
-                print 'IMPORTANT:', argument
+                if self._args.debug > 0:
+                    self.print_lf()
+                    print 'IMPORTANT:', argument
             else:
                 self.print_lf()
                 print 'Unrecognized line:',\

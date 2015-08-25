@@ -27,6 +27,12 @@ my_parser.add_argument(
     '-v', '--version',
     action='version',
     version='%(prog)s version 1.0.0')
+my_parser.add_argument(
+    '-d', '--debug',
+    default=2,
+    type=int,
+    help='Debug verbosity'
+         ' (type %(type)s, default=%(default)s)')
 
 
 def main():
