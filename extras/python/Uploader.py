@@ -91,7 +91,6 @@ class Uploader(object):
         self.reset_arduino()
         self._file_size = os.fstat(fd.fileno()).st_size
         bytes_written = 0
-        self._serial.write('xsvf\n')
         while True:
             line = self._serial.readline().strip()
             if not line:
