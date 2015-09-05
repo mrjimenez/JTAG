@@ -1,6 +1,6 @@
 #The JTAG Library for Arduino
 
-This library is actually two things.
+This library has four interesting things.
 
 First, it is a JTAG test access point (TAP) manipulation library. The code
 tries to be processor agnostic as much as possible, so that it can be used in
@@ -10,6 +10,13 @@ boundary scan tests, and even debug and take complete control of some hardware.
 
 Second, it is a XSVF file player. That way, it is possible to program CPLDs and
 FPGAs through the JTAG port.
+
+Third, there is a XSVF disassembler written in python, so that you can learn
+what is happening in the XSVF file you are using to program your device.
+
+And finally, there is a XSVF assembler, also written in python, so that you can
+recompile or write your own XSVF programs yourself in a maintainable and
+documented way, since the grammar supports comments.
 
 Remember that Arduino compatible devices are usually powered with 5 Volts,
 while most CPLDs and FPGAs will use a 3.3 Volts interface. In my original
@@ -155,6 +162,10 @@ Interesting links
 1. [Generating an SVF, XSVF, or STAPL File with Impact](http://www.xilinx.com/support/documentation/sw_manuals/xilinx11/pp_p_process_generate_svf_file.htm)
 
 1. [Executing XSVF/SVF Files with Impact](http://www.xilinx.com/itp/xilinx10/isehelp/pim_p_executing_xsvf_svf.htm)
+
+1. [A JTAG/XSVF Library for Arduino](http://eeandcs.blogspot.com.br/2015/08/jtagxsvf-library-for-arduino.html)
+
+1. [A XSVF Assembler/Disassembler in python](http://eeandcs.blogspot.com.br/2015/09/a-xsvf-assemblerdisassembler-in-python.html)
 
 1. [SVF on Wikipedia](https://en.wikipedia.org/wiki/Serial_Vector_Format)
 
