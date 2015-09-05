@@ -38,8 +38,8 @@ class Uploader(object):
                  ' (type %(type)s, default=%(default)s)')
 
     def __init__(self, args):
-        self._serial = serial.Serial(port=args.port, baudrate=args.baud)
         self._args = args
+        self._serial = serial.Serial(port=args.port, baudrate=args.baud)
         # Help printing new lines
         self._need_lf = False
         #

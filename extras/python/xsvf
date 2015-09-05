@@ -2,6 +2,7 @@
 # coding: utf-8
 
 import argparse
+import XSVFAssembler
 import XSVFDisassembler
 import sys
 import Uploader
@@ -13,7 +14,7 @@ my_parser = argparse.ArgumentParser(
 my_parser.add_argument(
     '-c', '--command',
     type=str,
-    choices=['upload', 'disasm'],
+    choices=['upload', 'disasm', 'asm'],
     default='upload',
     help='command to execute.'
          ' (default=%(default)s)')
@@ -36,17 +37,20 @@ my_parser.add_argument(
 
 
 def main():
-    ok = False
-    error_code = -1;
+    error_code = -1
     Uploader.Uploader.add_arguments(my_parser)
+    XSVFDisassembler.XSVFDisassembler.add_arguments(my_parser)
     args = my_parser.parse_args()
     if args.command == 'upload':
-        u = Uploader.Uploader(args.port, args.baud)
-        ok = u.upload_all_files(args.fileName)
+        u = Uploader.Uploader(args)
+        u.upload_all_files(args.fileName)
         error_code = u.error_code
     elif args.command == 'disasm':
-        d = XSVFDisassembler.XSVFDisassembler()
+        d = XSVFDisassembler.XSVFDisassembler(args)
         error_code = d.disasm_all_files(args.fileName)
+    elif args.command == 'asm':
+        a = XSVFAssembler.XSVFAssembler(args)
+        error_code = a.assemble_all_files(args.fileName)
     sys.exit(error_code)
 
 if __name__ == '__main__':

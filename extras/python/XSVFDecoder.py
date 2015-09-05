@@ -39,7 +39,8 @@ class XSVFDecoder(object):
     def num_bytes(n):
         return (n + 7) >> 3
 
-    def __init__(self):
+    def __init__(self, args):
+        self._args = args
         self._error_code = 0
         self._iter_file = None
         #
@@ -68,12 +69,13 @@ class XSVFDecoder(object):
         self._tdo_expected = []
         self._address_mask = []
         self._data_mask = []
+        self._xsdrinc_start_address = []
+        self._xsdrinc_num_times = 0
+        self._xsdrinc_data_list = []
         self._comment = ""
         self._instruction_counter = 0
         self._current_instruction_string = ""
 
-
-    #
     @property
     def error_code(self):
         return self._error_code
@@ -131,7 +133,7 @@ class XSVFDecoder(object):
 
     @property
     def length2_bytes(self):
-        return self._sirsize_bytes
+        return self._length2_bytes
 
     @property
     def repeat(self):
@@ -233,7 +235,7 @@ class XSVFDecoder(object):
 
     @property
     def tdo_mask(self):
-        """The TDO sequence to be read"""
+        """The TDO sequence mask"""
         return self._tdo_mask
 
     @tdo_mask.setter
@@ -259,12 +261,12 @@ class XSVFDecoder(object):
 
     @property
     def address_mask(self):
-        """The TDO sequence to be read"""
+        """The XSETSDRMASKS address mask"""
         return self._address_mask
 
     @address_mask.setter
     def address_mask(self, value):
-        self.address_mask = value
+        self._address_mask = value
 
     @address_mask.deleter
     def address_mask(self):
@@ -272,7 +274,7 @@ class XSVFDecoder(object):
 
     @property
     def data_mask(self):
-        """The TDO sequence to be read"""
+        """The XSETSDRMASKS data mask"""
         return self._data_mask
 
     @data_mask.setter
@@ -282,6 +284,44 @@ class XSVFDecoder(object):
     @data_mask.deleter
     def data_mask(self):
         del self._data_mask
+
+    @property
+    def xsdrinc_start_address(self):
+        """XSDRINC start address"""
+        return self._xsdrinc_start_address
+
+    @xsdrinc_start_address.setter
+    def xsdrinc_start_address(self, value):
+        self._xsdrinc_start_address = value
+
+    @xsdrinc_start_address.deleter
+    def xsdrinc_start_address(self):
+        del self._xsdrinc_start_address
+
+    @property
+    def xsdrinc_num_times(self):
+        """The length of the XSDRINC data list"""
+        return self._xsdrinc_num_times
+
+    @xsdrinc_num_times.setter
+    def xsdrinc_num_times(self, value):
+        self._xsdrinc_num_times = value
+
+    @xsdrinc_num_times.deleter
+    def xsdrinc_num_times(self):
+        del self._xsdrinc_num_times
+
+    @property
+    def xsdrinc_data_list(self):
+        return self._xsdrinc_data_list
+
+    @xsdrinc_data_list.setter
+    def xsdrinc_data_list(self, value):
+        self._xsdrinc_data_list = value
+
+    @xsdrinc_data_list.deleter
+    def xsdrinc_data_list(self):
+        del self._xsdrinc_data_list
 
     @property
     def comment(self):
@@ -365,11 +405,27 @@ class XSVFDecoder(object):
     def decode_xsetsdrmasks(self):
         self.address_mask = self.get_next_bytes(self.sdrsize_bytes)
         self.data_mask = self.get_next_bytes(self.sdrsize_bytes)
+        # Count the number of bits '1' in data_mask
+        n = 0
+        for j in range(self.sdrsize_bytes):
+            b = self.data_mask[j]
+            for k in range(8):
+                if b & 1:
+                    n += 1
+                b >>= 1
+        self.length2_bits = n
         return True
 
     def decode_xsdrinc(self):
-        self.error_code = -1
-        return False
+        self.xsdrinc_start_address = self.get_next_bytes(self.sdrsize_bytes)
+        self.xsdrinc_num_times = self.get_next_byte()
+        n = self.xsdrinc_num_times
+        self.xsdrinc_data_list = []
+        while n:
+            self.xsdrinc_data_list.append(
+                self.get_next_bytes(self.length2_bytes))
+            n -= 1
+        return True
 
     def decode_xsdrb(self):
         self.tdi = self.get_next_bytes(self.sdrsize_bytes)
@@ -484,7 +540,7 @@ class XSVFDecoder(object):
     def instruction_decoder(self, instruction):
         return self._instruction_data[instruction][XSVFDecoder._DECODER](self)
 
-    def instruction_handle(self, instruction):
+    def instruction_handler(self, instruction):
         pass
 
     @staticmethod
@@ -541,7 +597,7 @@ class XSVFDecoder(object):
                 return False
             ok = self.instruction_decoder(instruction)
             if ok:
-                self.instruction_handle(instruction)
+                self.instruction_handler(instruction)
         return True
 
     def decode_all_files(self, fd_list):
