@@ -1,11 +1,14 @@
 #ifndef JTAGPORTAVR_H
 #define JTAGPORTAVR_H
 
-#include <Arduino.h>
-//#include <JTAGPort.h>
+#include <JTAGPort.h>
 
-//class JTAGPortAVR : public JTAGPort
-class JTAGPort
+#include <Arduino.h>
+
+/*
+ * This is a faster version of the JTAGPort, but requires a fixed pin assignment.
+ */
+class JTAGPortAVR : public JTAGPort
 {
 private:
 	enum
@@ -21,13 +24,13 @@ private:
 	uint8_t m_portb;
 
 public:
-	JTAGPort()
+	JTAGPortAVR()
 	: m_portb(0)
 	{
 		DDRB = TMS | TDI | TCK;
 	}
 
-	~JTAGPort() {}
+	~JTAGPortAVR() {}
 
 	void pulse_clock()
 	{
@@ -47,14 +50,10 @@ public:
 	}
 
 	void set_tms() { set_port(TMS); }
-
 	void clr_tms() { clr_port(TMS); }
-
 	void set_tdi() { set_port(TDI); }
-
 	void clr_tdi() { clr_port(TDI); }
-
-        virtual bool read_vref() { return PINB & VREF; }
+	bool read_vref() const { return PINB & VREF; }
 
 private:
 	void write_portb_if_tck(uint8_t pin) {

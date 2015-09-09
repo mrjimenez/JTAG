@@ -7,6 +7,8 @@
 ########################################
 
 JTAGPort			KEYWORD1
+JTAGPortAVR			KEYWORD1
+JTAGPortArduino			KEYWORD1
 JTAGTAP				KEYWORD1
 SerialComm			KEYWORD1
 XSVFPlayerJTAG			KEYWORD1

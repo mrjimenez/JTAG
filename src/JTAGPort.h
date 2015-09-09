@@ -2,11 +2,10 @@
 #define JTAGPORT_H
 
 /*
- * Dont make this class virtual. Reasons:
- * - It will consume 44 bytes of dynamic memory.
- * - It will make the code run about 6.3% slower.
+ * Making this class virtual makes the code bigger (18 bytes) and slower. But
+ * it is the right thing to do if we want to reuse the code in a non-messy way.
  */
-#ifdef BAD_IDEA
+
 class JTAGPort
 {
 public:
@@ -19,34 +18,8 @@ public:
 	virtual void clr_tms() = 0;
 	virtual void set_tdi() = 0;
 	virtual void clr_tdi() = 0;
-        virtual bool read_vref() = 0;
+	virtual bool read_vref() const = 0;
 };
-#endif // BAD_IDEA
-
-#if defined(ARDUINO_ARCH_AVR)
-
-    #include <JTAGPortAVR.h>
-
-#elif defined(ARDUINO_ARCH_SAM)
-
-    #include <JTAGPortSAM.h>
-
-#else // Generic code
-    class JTAGPort
-    {
-    public:
-            JTAGPort() {}
-            ~JTAGPort() {}
-
-            void pulse_clock() {}
-            bool pulse_clock_and_read_tdo() { return false; }
-            void set_tms() {}
-            void clr_tms() {}
-            void set_tdi() {}
-            void clr_tdi() {}
-            bool read_vref() { return false; }
-    };
-#endif
 
 #endif  // JTAGPORT_H
 

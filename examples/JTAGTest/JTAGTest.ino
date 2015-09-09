@@ -1,5 +1,8 @@
 
-#include <JTAG.h>
+//#include <JTAGPortAVR.h>
+#include <JTAGPortArduino.h>
+#include <SerialComm.h>
+#include <XSVFPlayerJTAG.h>
 
 //
 // The maximum size of the arduino receive buffer is 63 bytes by default.
@@ -22,7 +25,8 @@ void loop()
 {
 	SerialComm s(Serial, SERIAL_RX_BUFFER_SIZE);
 	printFreeMemory(s);
-	JTAGPort j;
+	//JTAGPortAVR j;
+	JTAGPortArduino j(8, 9, 10, 11, 12);
 	XSVFPlayerJTAG p(s, j);
 	
 	uint32_t n = 0;
@@ -39,6 +43,7 @@ void loop()
 				s.Important(F("Success!"));
 				s.Important(F("********"));
 			}
+			p.print_last_tdo();
 			break;
 		}
 	}

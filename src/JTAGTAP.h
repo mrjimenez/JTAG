@@ -28,10 +28,10 @@ class JTAGTAP
 {
 private:
 	SerialComm &m_serial_comm;
-	JTAGPort m_jtag_port;
+	JTAGPort &m_jtag_port;
 	uint8_t m_current_state;
 
-        SerialComm &serialComm() { return m_serial_comm; }
+	SerialComm &serialComm() { return m_serial_comm; }
 
 	JTAGPort &jtagPort() { return m_jtag_port; }
 
