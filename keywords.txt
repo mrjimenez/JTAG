@@ -10,12 +10,18 @@ JTAGPort			KEYWORD1
 JTAGPortAVR			KEYWORD1
 JTAGPortArduino			KEYWORD1
 JTAGTAP				KEYWORD1
+PlayXSVF			KEYWORD1
+PlayXSVFJTAGArduino		KEYWORD1
+PlayXSVFJTAGAVR			KEYWORD1
 SerialComm			KEYWORD1
 XSVFPlayerJTAG			KEYWORD1
 
 ########################################
 # Methods and Functions (KEYWORD2)
 ########################################
+
+play				KEYWORD2
+printAvailableRAM		KEYWORD2
 
 Important			KEYWORD2
 ImportantBits			KEYWORD2

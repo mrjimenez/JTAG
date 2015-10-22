@@ -109,6 +109,11 @@ compiler.elf2hex.extra_flags=
 The best information about the location of the file "platform.local.txt" I
 found was [here](https://github.com/arduino/Arduino/wiki/Boards-Manager-FAQ).
 
+Another suggestion: if speed is really an issue, instead of using
+"JTAGPortArduino", use "JTAGPortAVR". Take a look at PlayXSVFJTAVR.{cpp,h}.
+JTAGPortAVR uses the same pin configuration I have mentioned before, but since
+all the pins are on AVR's PORTB, all pins are written at once, so the JTAG port
+code is more efficient.
 
 Using it to play XSVF
 =====================
