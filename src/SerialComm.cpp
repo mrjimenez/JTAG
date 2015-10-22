@@ -207,6 +207,14 @@ void SerialComm::Quit(int error_code, const __FlashStringHelper *message) const
 
 void SerialComm::print_bytes(const uint8_t *pb, uint32_t count, bool lf)
 {
+	if (!count) {
+		if (lf) {
+			serial().println(F(" "));
+		} else {
+			serial().print(F(" "));
+		}
+		return;
+	}
 	const unsigned char *p = reinterpret_cast<const unsigned char *>(pb);
 	char *fmt_msg = " %02X";
 	int fmt_msg_size = 3;
