@@ -38,8 +38,8 @@ private:
 	uint8_t m_data_mask[S_MAX_CHAIN_SIZE_BYTES];
 
 	uint16_t m_instruction_counter;
-        uint32_t m_stream_sum;
-        uint8_t m_error_code;
+	uint32_t m_stream_sum;
+	int m_error_code;
 
 	// The following maximum buffer size has been tested to be an exact
 	// value. If you change any program messages or strings, with debug
@@ -222,8 +222,8 @@ protected:
 	uint32_t streamSum() const { return m_stream_sum; }
 	void addStreamSum(uint8_t n) { m_stream_sum += n; }
 
-	uint8_t errorCode() const { return m_error_code; }
-	void setErrorCode(uint8_t n) { m_error_code = n; }
+	int errorCode() const { return m_error_code; }
+	void setErrorCode(int n) { m_error_code = n; }
 
 	/*
 	 * XSVF instruction decoders
