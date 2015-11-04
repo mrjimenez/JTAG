@@ -28,7 +28,7 @@ private:
 	uint32_t m_wait_time_usecs;
 	bool m_xcomplete;
 
-	static const uint32_t S_MAX_CHAIN_SIZE_BYTES = 40;
+	static const uint32_t S_MAX_CHAIN_SIZE_BYTES = 128;
 	static const uint32_t S_MAX_CHAIN_SIZE_BITS = S_MAX_CHAIN_SIZE_BYTES * 8;
 	uint8_t m_tdi[S_MAX_CHAIN_SIZE_BYTES];
 	uint8_t m_tdo[S_MAX_CHAIN_SIZE_BYTES];
