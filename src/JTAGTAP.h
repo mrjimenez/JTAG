@@ -5,7 +5,8 @@
 #include <JTAGPort.h>
 #include <SerialComm.h>
 
-enum e_TAPState {
+enum e_TAPState
+{
 	STATE_TEST_LOGIC_RESET =  0,
 	STATE_RUN_TEST_IDLE,  //  1
 	STATE_SELECT_DR_SCAN, //  2
