@@ -63,7 +63,7 @@ public:
 	{
 		if (vrefIsAnalog()) {
 			// Use 1.0 V as threshold
-			return analogRead(A1) * 5 / 1023 > 1;
+			return analogRead(vref().pin()) * 5 / 1023 > 1;
 		} else {
 			return vref().read();
 		}

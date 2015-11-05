@@ -8,10 +8,11 @@ PlayXSVFJTAGArduino::PlayXSVFJTAGArduino(
 	uint8_t tdi,
 	uint8_t tdo,
 	uint8_t tck,
-	uint8_t vref)
+	uint8_t vref,
+	bool vref_is_analog)
 : PlayXSVF()
 , m_serial_comm(s, stream_buffer_size)
-, m_jtag_port(tms, tdi, tdo, tck, vref)
+, m_jtag_port(tms, tdi, tdo, tck, vref, vref_is_analog)
 , m_xsvf_player(serialComm(), jtagPort())
 {
 }
