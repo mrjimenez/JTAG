@@ -205,7 +205,7 @@ bool XSVFPlayerJTAG::sdr(bool must_begin, bool must_check, bool use_mask, bool m
 		}
 	}
 
-	return matched;
+	return !must_check || (must_check && matched);
 }
 
 bool XSVFPlayerJTAG::is_tdo_as_expected(bool use_mask)
