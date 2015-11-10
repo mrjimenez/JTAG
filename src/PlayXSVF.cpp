@@ -33,6 +33,11 @@ int PlayXSVF::play()
 	return ret;
 }
 
+void  PlayXSVF::printAvailableRAM()
+{
+	::printAvailableRAM(serialComm());
+}
+
 void printAvailableRAM(Stream &s)
 {
 	s.print(F("Available RAM: "));

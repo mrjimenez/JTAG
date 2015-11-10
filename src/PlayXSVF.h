@@ -17,6 +17,8 @@ public:
 	~PlayXSVF() {}
 
 	int play();
+
+	void printAvailableRAM();
 };
 
 
