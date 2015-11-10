@@ -23,9 +23,11 @@ void setup()
 
 void loop()
 {
+	//PlayXSVFJTAGArduino p(Serial, SERIAL_RX_BUFFER_SIZE, 2, 12, 5, 4, 0, true);
 	PlayXSVFJTAGArduino p(Serial, SERIAL_RX_BUFFER_SIZE, 8, 9, 10, 11, 12);
 	//PlayXSVFJTAGAVR p(Serial, SERIAL_RX_BUFFER_SIZE);
-	//printAvailableRAM(Serial);
+	//p.printAvailableRAM();
+	// Currently, the PlayXSVFJTAGArduino object consumes 1042 bytes of RAM
 	p.play();
 }
 
