@@ -27,6 +27,7 @@ int PlayXSVF::play()
 			p.print_last_tdo();
 			break;
 		}
+		yield();
 	}
 	s.Important(F("Processed %d instructions."), n);
 
