@@ -28,22 +28,22 @@ static const uint8_t tms_transitions[] = {
 };
 
 #define BITSTR(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P) ( \
-	((A) << 15) | \
-	((B) << 14) | \
-	((C) << 13) | \
-	((D) << 12) | \
-	((E) << 11) | \
-	((F) << 10) | \
-	((G) <<  9) | \
-	((H) <<  8) | \
-	((I) <<  7) | \
-	((J) <<  6) | \
-	((K) <<  5) | \
-	((L) <<  4) | \
-	((M) <<  3) | \
-	((N) <<  2) | \
-	((O) <<  1) | \
-	((P) <<  0) )
+	((uint16_t)(A) << 15) | \
+	((uint16_t)(B) << 14) | \
+	((uint16_t)(C) << 13) | \
+	((uint16_t)(D) << 12) | \
+	((uint16_t)(E) << 11) | \
+	((uint16_t)(F) << 10) | \
+	((uint16_t)(G) <<  9) | \
+	((uint16_t)(H) <<  8) | \
+	((uint16_t)(I) <<  7) | \
+	((uint16_t)(J) <<  6) | \
+	((uint16_t)(K) <<  5) | \
+	((uint16_t)(L) <<  4) | \
+	((uint16_t)(M) <<  3) | \
+	((uint16_t)(N) <<  2) | \
+	((uint16_t)(O) <<  1) | \
+	((uint16_t)(P) <<  0) )
 
 /*
  * The index of this vector is the current state. The i-th bit tells you the

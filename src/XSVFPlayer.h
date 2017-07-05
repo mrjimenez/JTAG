@@ -217,7 +217,7 @@ protected:
 	uint8_t *dataMask() { return m_data_mask; }
 
 	uint16_t instructionCounter() const { return m_instruction_counter; }
-	uint16_t incrementInstructionCounter() { ++m_instruction_counter; }
+	void incrementInstructionCounter() { ++m_instruction_counter; }
 
 	uint32_t streamSum() const { return m_stream_sum; }
 	void addStreamSum(uint8_t n) { m_stream_sum += n; }

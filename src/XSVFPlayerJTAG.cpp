@@ -130,7 +130,7 @@ bool XSVFPlayerJTAG::execute_XCOMMENT()
 	return true;
 }
 
-void XSVFPlayerJTAG::execute_XCOMMENT_auxiliar(uint8_t c)
+void XSVFPlayerJTAG::execute_XCOMMENT_auxiliar(uint8_t /*c*/)
 {
 }
 
@@ -139,6 +139,8 @@ bool XSVFPlayerJTAG::execute_XWAIT()
 	state_goto(waitStartState());
 	jtagTap().wait_time(waitTimeUsecs());
 	state_goto(waitEndState());
+
+	return true;
 }
 
 void XSVFPlayerJTAG::state_goto(int state)
@@ -215,7 +217,7 @@ bool XSVFPlayerJTAG::is_tdo_as_expected(bool use_mask)
 	serialComm().DebugBytes(F("... expecting:"),
 		tdoExpected(), sdrsizeBytes());
 	serialComm().DebugBytes(F("... received: "), tdo(), sdrsizeBytes());
-	for (int i = 0; i < sdrsizeBytes(); ++i) {
+	for (uint32_t i = 0; i < sdrsizeBytes(); ++i) {
 		uint8_t expected = tdoExpected()[i];
 		uint8_t actual = tdo()[i];
 		if (use_mask) {

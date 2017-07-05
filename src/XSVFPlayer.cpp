@@ -418,7 +418,7 @@ bool XSVFPlayer::decode_XCOMMENT()
 	serialComm().DebugStartMessage();
 	serialComm().DebugContMessage(F("XCOMMENT:"));
 	uint8_t c;
-	while (c = getNextByte()) {
+	while ((c = getNextByte())) {
 		serialComm().DebugContMessage(F("%c"), c);
 		execute_XCOMMENT_auxiliar(c);
 	}

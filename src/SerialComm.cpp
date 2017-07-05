@@ -185,9 +185,9 @@ void SerialComm::DebugBytes(const __FlashStringHelper *s, const uint8_t *b,
 #else
 
 void SerialComm::DebugStartMessage() const {}
-void SerialComm::DebugContMessage(const __FlashStringHelper *ifsh, ...) {}
-void SerialComm::Debug(const __FlashStringHelper *fmt, ...) {}
-void SerialComm::DebugBytes(const __FlashStringHelper *s, const uint8_t* p, uint8_t n) {}
+void SerialComm::DebugContMessage(const __FlashStringHelper * /*ifsh*/, ...) {}
+void SerialComm::Debug(const __FlashStringHelper * /*fmt*/, ...) {}
+void SerialComm::DebugBytes(const __FlashStringHelper * /*s*/, const uint8_t * /*b*/, uint8_t /*n*/) {}
 
 #endif
 
@@ -216,7 +216,7 @@ void SerialComm::print_bytes(const uint8_t *pb, uint32_t count, bool lf)
 		return;
 	}
 	const unsigned char *p = reinterpret_cast<const unsigned char *>(pb);
-	char *fmt_msg = " %02X";
+	const char *fmt_msg = " %02X";
 	int fmt_msg_size = 3;
 	while (count) {
 		char *f = formatBuffer();
