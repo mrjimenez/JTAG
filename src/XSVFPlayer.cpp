@@ -40,6 +40,22 @@ XSVFPlayer::~XSVFPlayer()
 	serialComm().Quit(errorCode(), error_message(errorCode()));
 }
 
+#ifndef ARDUINO_ARCH_AVR
+// All bytes must pass through this function
+uint8_t XSVFPlayer::nextByte()
+{
+	int c = serialComm().nextByte();
+	if (c != -1) {
+		addStreamSum(c);
+	} else {
+		serialComm().Quit(ERR_SERIAL_PORT_TIMEOUT,
+			F("Serial port timeout!"));
+	}
+
+	return static_cast<uint8_t>(c);
+}
+#endif // ARDUINO_ARCH_AVR
+
 uint8_t XSVFPlayer::getNextByte()
 {
 	uint8_t i = nextByte();
@@ -150,6 +166,21 @@ bool XSVFPlayer::handle_next_instruction()
 		return false;
 	}
 }
+
+#ifndef ARDUINO_ARCH_AVR
+void XSVFPlayer::setStringBuffer(const __FlashStringHelper *s)
+{
+	PGM_P p = reinterpret_cast<PGM_P>(s);
+	size_t n = strlen_P(p);
+	if (n > S_STRING_BUFFER_SIZE - 1) {
+		serialComm().Debug(
+			F(">>>>>>>>>>>> String truncated by %d bytes."),
+			n - S_STRING_BUFFER_SIZE + 1);
+	}
+	strncpy_P(m_string_buffer, p, S_STRING_BUFFER_SIZE);
+	m_string_buffer[S_STRING_BUFFER_SIZE - 1] = 0;
+}
+#endif // ARDUINO_ARCH_AVR
 
 const __FlashStringHelper *XSVFPlayer::instruction_name(uint8_t instruction)
 {

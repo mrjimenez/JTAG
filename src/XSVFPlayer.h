@@ -79,6 +79,7 @@ private:
         SerialComm &serialComm() { return m_serial_comm; }
 	SerialComm &serialComm() const { return m_serial_comm; }
 
+#ifdef ARDUINO_ARCH_AVR
 	// All bytes must pass through this function
 	uint8_t nextByte()
 	{
@@ -92,6 +93,9 @@ private:
 
 		return static_cast<uint8_t>(c);
 	}
+#else // ARDUINO_ARCH_AVR
+	uint8_t nextByte();
+#endif // ARDUINO_ARCH_AVR
 
 	// Returns the next byte from the stream.
 	uint8_t getNextByte();
@@ -143,6 +147,7 @@ public:
 
 protected:
 	const char *stringBuffer() const { return m_string_buffer; }
+#ifdef ARDUINO_ARCH_AVR
 	void setStringBuffer(const __FlashStringHelper *s)
 	{
 		PGM_P p = reinterpret_cast<PGM_P>(s);
@@ -155,6 +160,9 @@ protected:
 		strncpy_P(m_string_buffer, p, S_STRING_BUFFER_SIZE);
 		m_string_buffer[S_STRING_BUFFER_SIZE - 1] = 0;
 	}
+#else // ARDUINO_ARCH_AVR
+	void setStringBuffer(const __FlashStringHelper *s);
+#endif // ARDUINO_ARCH_AVR
 	
 	const __FlashStringHelper *instruction_name(uint8_t instruction);
 	const __FlashStringHelper *state_name(uint8_t state);

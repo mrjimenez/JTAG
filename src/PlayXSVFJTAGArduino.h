@@ -1,4 +1,3 @@
-
 #ifndef PLAYXSVFJTAGARDUINO_H
 #define PLAYXSVFJTAGARDUINO_H
 
@@ -6,7 +5,6 @@
 #include <PlayXSVF.h>
 #include <SerialComm.h>
 #include <XSVFPlayerJTAG.h>
-
 
 class PlayXSVFJTAGArduino : public PlayXSVF
 {

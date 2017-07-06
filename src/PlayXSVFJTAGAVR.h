@@ -1,3 +1,4 @@
+#ifdef ARDUINO_ARCH_AVR
 
 #ifndef PLAYXSVFJTAGAVR_H
 #define PLAYXSVFJTAGAVR_H
@@ -6,7 +7,6 @@
 #include <PlayXSVF.h>
 #include <SerialComm.h>
 #include <XSVFPlayerJTAG.h>
-
 
 class PlayXSVFJTAGAVR : public PlayXSVF
 {
@@ -30,4 +30,6 @@ public:
 };
 
 #endif // PLAYXSVFJTAGAVR_H
+
+#endif // ARDUINO_ARCH_AVR
 
