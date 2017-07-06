@@ -28,13 +28,20 @@ public:
 	uint8_t mode() const { return m_mode; }
 };
 
+#ifdef ARDUINO_ARCH_AVR
+	#define GPIO_REGISTER_TYPE uint8_t
+#elif defined ARDUINO_ARCH_ESP8266
+	#define GPIO_REGISTER_TYPE uint32_t
+#else
+	#define GPIO_REGISTER_TYPE uint8_t
+#endif
 
 class ArduinoInputPin : public ArduinoPin
 {
 private:
-	volatile uint8_t *m_in;
+	volatile GPIO_REGISTER_TYPE *m_in;
 
-	volatile uint8_t *in() const { return m_in; }
+	volatile GPIO_REGISTER_TYPE *in() const { return m_in; }
 
 public:
 	ArduinoInputPin(uint8_t pin);
@@ -47,9 +54,9 @@ public:
 class ArduinoOutputPin : public ArduinoPin
 {
 private:
-	volatile uint8_t *m_out;
+	volatile GPIO_REGISTER_TYPE *m_out;
 
-	volatile uint8_t *out() const { return m_out; }
+	volatile GPIO_REGISTER_TYPE *out() const { return m_out; }
 
 public:
 	ArduinoOutputPin(uint8_t pin);

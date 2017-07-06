@@ -1,3 +1,4 @@
+#ifdef ARDUINO_ARCH_AVR
 
 #include <PlayXSVFJTAGAVR.h>
 
@@ -10,4 +11,6 @@ PlayXSVFJTAGAVR::PlayXSVFJTAGAVR(
 , m_xsvf_player(serialComm(), jtagPort())
 {
 }
+
+#endif // ARDUINO_ARCH_AVR
 

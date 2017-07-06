@@ -1,3 +1,5 @@
+#ifdef ARDUINO_ARCH_AVR
+
 #ifndef JTAGPORTAVR_H
 #define JTAGPORTAVR_H
 
@@ -74,4 +76,6 @@ private:
 };
 
 #endif  // JTAGPORTAVR_H
+
+#endif // ARDUINO_ARCH_AVR
 

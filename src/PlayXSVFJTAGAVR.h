@@ -1,3 +1,4 @@
+#ifdef ARDUINO_ARCH_AVR
 
 #ifndef PLAYXSVFJTAGAVR_H
 #define PLAYXSVFJTAGAVR_H
@@ -7,11 +8,11 @@
 #include <SerialComm.h>
 #include <XSVFPlayerJTAG.h>
 
-
 class PlayXSVFJTAGAVR : public PlayXSVF
 {
 private:
 	SerialComm m_serial_comm;
+	// This JTAG tap is a bit faster, but the pins are hardwired.
 	JTAGPortAVR m_jtag_port;
 	XSVFPlayerJTAG m_xsvf_player;
 
@@ -29,4 +30,6 @@ public:
 };
 
 #endif // PLAYXSVFJTAGAVR_H
+
+#endif // ARDUINO_ARCH_AVR
 
