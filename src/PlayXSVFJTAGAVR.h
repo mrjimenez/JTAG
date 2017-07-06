@@ -12,6 +12,7 @@ class PlayXSVFJTAGAVR : public PlayXSVF
 {
 private:
 	SerialComm m_serial_comm;
+	// This JTAG tap is a bit faster, but the pins are hardwired.
 	JTAGPortAVR m_jtag_port;
 	XSVFPlayerJTAG m_xsvf_player;
 
