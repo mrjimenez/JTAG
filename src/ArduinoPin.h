@@ -32,6 +32,8 @@ public:
 	#define GPIO_REGISTER_TYPE uint8_t
 #elif defined ARDUINO_ARCH_ESP8266
 	#define GPIO_REGISTER_TYPE uint32_t
+#elif defined ARDUINO_ARCH_ESP32
+	#define GPIO_REGISTER_TYPE uint32_t
 #else
 	#define GPIO_REGISTER_TYPE uint8_t
 #endif
@@ -67,4 +69,3 @@ public:
 };
 
 #endif // ARDUINOPIN_H
-
