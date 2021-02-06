@@ -468,7 +468,7 @@ class XSVFDecoder(object):
         else:
             self.error_code = -2
             ret = False
-            print "Invalid XENDIR parameter %d" % s
+            print("Invalid XENDIR parameter %d" % s)
         return ret
 
     def decode_xenddr(self):
@@ -481,7 +481,7 @@ class XSVFDecoder(object):
         else:
             self.error_code = -3
             ret = False
-            print "Invalid XENDDR parameter %d" % s
+            print("Invalid XENDDR parameter %d" % s)
         return ret
 
     def decode_xsir2(self):
@@ -593,7 +593,7 @@ class XSVFDecoder(object):
             self.current_instruction_string = ""
             instruction = self.get_next_byte()
             if instruction > self.XWAIT:
-                print "Invalid instruction: 0x%02x" % instruction
+                print("Invalid instruction: 0x%02x" % instruction)
                 return False
             ok = self.instruction_decoder(instruction)
             if ok:

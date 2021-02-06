@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # coding: utf-8
 
 import os
@@ -9,18 +9,18 @@ import time
 try:
     import serial
 except ImportError:
-    print "Error importing pyserial. Please check if it is installed."
+    print("Error importing pyserial. Please check if it is installed.")
     sys.exit(1)
+
 
 class Uploader(object):
     """Uploads a XSVF file to the arduino board.
     """
 
     # Create a translation array of printable characters
-    _printable_chars = string.digits + string.letters + string.punctuation + ' '
+    _printable_chars = string.printable
     _translate_str = ''.join(
         [(chr(x) in _printable_chars) and chr(x) or '.' for x in range(256)])
-
 
     @staticmethod
     def add_arguments(p):
@@ -83,11 +83,13 @@ class Uploader(object):
     def print_hashes(self):
         cksum = (-self._sum) & 0xFF
         if self._args.debug > 1:
-            print '  Expected checksum:  0x%02X/%lu.' % (cksum, self._file_size)
-            print '  Expected sum: 0x%08lX/%lu.' % (self._sum, self._file_size)
+            print('  Expected checksum:  0x%02X/%lu.' %
+                  (cksum, self._file_size))
+            print('  Expected sum: 0x%08lX/%lu.' %
+                  (self._sum, self._file_size))
         if self._start_time > 0:
-            print 'Elapsed time: %.02f seconds.' % \
-                  (time.time() - self._start_time)
+            print('Elapsed time: %.02f seconds.' %
+                  (time.time() - self._start_time))
 
     def upload_one_file(self, fd):
         self.reset_arduino()
@@ -107,15 +109,15 @@ class Uploader(object):
                 xsvf_data += chr(0xff) * (num_bytes - len(xsvf_data))
                 self._serial.write(xsvf_data)
                 if self._args.debug > 1:
-                    print '\rSent: %8d bytes, %8d remaining' % \
-                          (bytes_written, self._file_size - bytes_written),
+                    print('\rSent: %8d bytes, %8d remaining' %
+                          (bytes_written, self._file_size - bytes_written), end='')
                     sys.stdout.flush()
                     self._need_lf = True
             elif command == 'R':
                 self.initialize_hashes()
                 if self._args.debug > 1:
-                    print 'File: %s' % os.path.realpath(fd.name)
-                    print 'Ready to send %d bytes.' % self._file_size
+                    print('File: %s' % os.path.realpath(fd.name))
+                    print('Ready to send %d bytes.' % self._file_size)
                 self._start_time = time.time()
             elif command == 'Q':
                 self.print_lf()
@@ -124,22 +126,22 @@ class Uploader(object):
                 args = argument.split(',')
                 self.error_code = int(args[0])
                 if self._args.debug > 1:
-                    print 'Quit: {1:s} ({0:d}).'.format(
-                        self.error_code, args[1])
+                    print('Quit: {1:s} ({0:d}).'.format(
+                        self.error_code, args[1]))
                 self.print_hashes()
                 return self.error_code == 0
             elif command == 'D':
                 if self._args.debug > 0:
                     self.print_lf()
-                    print 'Device:', argument
+                    print('Device:', argument)
             elif command == '!':
                 if self._args.debug > 0:
                     self.print_lf()
-                    print 'IMPORTANT:', argument
+                    print('IMPORTANT:', argument)
             else:
                 self.print_lf()
-                print 'Unrecognized line:',\
-                    line.translate(Uploader._translate_str)
+                print('Unrecognized line:',
+                      line.translate(Uploader._translate_str))
 
     def upload_all_files(self, fd_list):
         ok = True

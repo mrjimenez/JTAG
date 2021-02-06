@@ -102,12 +102,12 @@ class XSVFDisassembler(XSVFDecoder.XSVFDecoder):
             l2_0 = self.return_zeroeth(l2)
             if self._args.no_bytes:
                 if l2_0:
-                    print '{0:s}'.format(l2_0)
+                    print('{0:s}'.format(l2_0))
             else:
                 if l2_0:
-                    print '{0:<24}    {1:s}'.format(l1_0, l2_0)
+                    print('{0:<24}    {1:s}'.format(l1_0, l2_0))
                 else:
-                    print '{0:s}'.format(l1_0)
+                    print('{0:s}'.format(l1_0))
             l1 = l1[1:]
             l2 = l2[1:]
 

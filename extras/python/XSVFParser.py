@@ -13,7 +13,8 @@ __all__ = ['parse_xsvf_file']
 # Comment
 asm_comment = pp.Suppress(pp.Group(';' + pp.restOfLine))
 optional_asm_comment = pp.Optional(asm_comment)
-xcomment_argument = pp.QuotedString(quoteChar='"', escQuote='""', multiline=True)
+xcomment_argument = pp.QuotedString(
+    quoteChar='"', escQuote='""', multiline=True)
 
 # Hexadecimal integers
 zero_ex = pp.Literal('0x') | pp.Literal('0X')
@@ -262,8 +263,9 @@ XCOMPLETE"""
 
 
 def main():
-    print xsvf_parser.parseString(xsvf_example, parseAll=True)
+    print(xsvf_parser.parseString(xsvf_example, parseAll=True))
     sys.exit(0)
+
 
 if __name__ == '__main__':
     main()
