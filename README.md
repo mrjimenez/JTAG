@@ -182,6 +182,8 @@ Interesting links
 
 1. [Nice JTAG TAP Controller State Diagram in SVF](https://de.wikipedia.org/wiki/Datei:JTAG_TAP_Controller_State_Diagram.svg)
 
+1. Youtube video: [Como programar CPLD Xilinx con Arduino](https://youtu.be/x5eW9H1GoeA)
+
 
 Credits
 =======
