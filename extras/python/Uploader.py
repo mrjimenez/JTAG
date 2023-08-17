@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#! /usr/bin/python3
 # coding: utf-8
 
 import os
@@ -18,9 +18,8 @@ class Uploader(object):
     """
 
     # Create a translation array of printable characters
-    _printable_chars = string.printable
     _translate_str = ''.join(
-        [(chr(x) in _printable_chars) and chr(x) or '.' for x in range(256)])
+        [(chr(x) in string.printable) and chr(x) or '.' for x in range(256)])
 
     @staticmethod
     def add_arguments(p):
