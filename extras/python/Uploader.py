@@ -17,9 +17,10 @@ class Uploader(object):
     """Uploads a XSVF file to the arduino board."""
 
     # Create a translation array of printable characters
-    _translate_str = "".join(
+    _translate_str_1 = "".join(
         [(chr(x) in string.printable) and chr(x) or "." for x in range(256)]
     )
+    _translate_str = bytes(_translate_str_1, "ascii")
 
     @staticmethod
     def add_arguments(p):
@@ -79,7 +80,7 @@ class Uploader(object):
 
     def update_hashes(self, s):
         for c in s:
-            self._sum += ord(c)
+            self._sum += c
 
     def print_hashes(self):
         cksum = (-self._sum) & 0xFF
@@ -97,14 +98,14 @@ class Uploader(object):
             line = self._serial.readline().strip()
             if not line:
                 continue
-            command = line[0]
-            argument = line[1:]
+            command = chr(line[0])
+            argument = line[1:].decode("ascii")
             if command == "S":
                 num_bytes = int(argument)
                 xsvf_data = fd.read(num_bytes)
                 bytes_written += len(xsvf_data)
                 self.update_hashes(xsvf_data)
-                xsvf_data += chr(0xFF) * (num_bytes - len(xsvf_data))
+                xsvf_data += b"\xFF" * (num_bytes - len(xsvf_data))
                 self._serial.write(xsvf_data)
                 if self._args.debug > 1:
                     print(
