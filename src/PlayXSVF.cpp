@@ -1,7 +1,7 @@
 
-#include <PlayXSVF.h>
+#include "PlayXSVF.h"
 
-#include <SerialComm.h>
+#include "SerialComm.h"
 #include <XSVFPlayer.h>
 
 int PlayXSVF::play()
@@ -11,7 +11,7 @@ int PlayXSVF::play()
 	int ret = 0;
 	uint32_t n = 0;
 	while (true) {
-		//p.test_code(2);
+		// p.test_code(2);
 		++n;
 		if (!p.handle_next_instruction()) {
 			ret = p.reached_xcomplete();
@@ -21,7 +21,8 @@ int PlayXSVF::play()
 				s.Important(F("********"));
 			} else {
 				s.Important(F("*****************************"));
-				s.Important(F("Failure at instruction #%5d"), n);
+				s.Important(F("Failure at instruction #%5d"),
+					    n);
 				s.Important(F("*****************************"));
 			}
 			p.print_last_tdo();
@@ -34,10 +35,7 @@ int PlayXSVF::play()
 	return ret;
 }
 
-void  PlayXSVF::printAvailableRAM()
-{
-	::printAvailableRAM(serialComm());
-}
+void PlayXSVF::printAvailableRAM() { ::printAvailableRAM(serialComm()); }
 
 void printAvailableRAM(Stream &s)
 {
@@ -65,4 +63,3 @@ int availableRAM()
 		freeValue = ((int)&freeValue) - ((int)__brkval);
 	return freeValue;
 }
-

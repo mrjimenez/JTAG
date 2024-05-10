@@ -2,7 +2,8 @@
 #ifndef PLAYXSVF_H
 #define PLAYXSVF_H
 
-class Stream;
+#include <Arduino.h> // for Stream
+
 class SerialComm;
 class XSVFPlayer;
 
@@ -21,10 +22,8 @@ public:
 	void printAvailableRAM();
 };
 
-
 void printAvailableRAM(Stream &s);
 void printAvailableRAM(SerialComm &s);
 int availableRAM();
 
 #endif // PLAYXSVF_H
-

@@ -1,10 +1,12 @@
 
 #include <XSVFPlayer.h>
 
+// clang-format off
 #define ERR_MSG(x,y) case x: { ret = y; break; }
 #define NAME_FOR(x) case x: return F(#x);
 #define NAME_FOR_STATE(x) case STATE_##x: return F(#x);
-#define DECODE(x) case x: if (decode_##x()) { return execute_##x(); };
+#define DECODE(x) case x: if (decode_##x()) { return execute_##x(); } break;
+// clang-format on
 
 XSVFPlayer::XSVFPlayer(SerialComm &s)
 : m_serial_comm(s)
@@ -30,10 +32,10 @@ XSVFPlayer::XSVFPlayer(SerialComm &s)
 XSVFPlayer::~XSVFPlayer()
 {
 	uint8_t checksum = (-streamSum()) & 0xFF;
-	serialComm().Important(F("Checksum:  0x%02X/%lu."),
-		checksum, serialComm().streamCount());
-	serialComm().Important(F("Sum: 0x%08lX/%lu."),
-		streamSum(), serialComm().streamCount());
+	serialComm().Important(F("Checksum:  0x%02X/%lu."), checksum,
+			       serialComm().streamCount());
+	serialComm().Important(F("Sum: 0x%08lX/%lu."), streamSum(),
+			       serialComm().streamCount());
 	if (errorCode() == ERR_NO_ERROR && !xcomplete()) {
 		setErrorCode(ERR_XCOMPLETE_NOT_REACHED);
 	}
@@ -49,7 +51,7 @@ uint8_t XSVFPlayer::nextByte()
 		addStreamSum(c);
 	} else {
 		serialComm().Quit(ERR_SERIAL_PORT_TIMEOUT,
-			F("Serial port timeout!"));
+				  F("Serial port timeout!"));
 	}
 
 	return static_cast<uint8_t>(c);
@@ -60,14 +62,14 @@ uint8_t XSVFPlayer::getNextByte()
 {
 	uint8_t i = nextByte();
 	serialComm().Debug(F(".    BYTE:%12u - 0x%02X"), i, i);
-	
+
 	return i;
 }
 
 uint16_t XSVFPlayer::getNextWord()
 {
 	uint16_t i = 0;
-	i  = ((uint16_t)nextByte()) << 8;
+	i = ((uint16_t)nextByte()) << 8;
 	i |= ((uint16_t)nextByte());
 	serialComm().Debug(F(".    WORD:12%u - 0x%04X"), i, i);
 
@@ -77,7 +79,7 @@ uint16_t XSVFPlayer::getNextWord()
 uint32_t XSVFPlayer::getNextLong()
 {
 	uint32_t i = 0;
-	i  = ((uint32_t)nextByte()) << 24;
+	i = ((uint32_t)nextByte()) << 24;
 	i |= ((uint32_t)nextByte()) << 16;
 	i |= ((uint32_t)nextByte()) << 8;
 	i |= ((uint32_t)nextByte());
@@ -114,8 +116,8 @@ const __FlashStringHelper *XSVFPlayer::error_message(int error_code)
 
 void XSVFPlayer::print_last_tdo() const
 {
-	serialComm().ImportantBits(F("!Last TDO:"),
-		last_tdo(), last_dr_size_bits());
+	serialComm().ImportantBits(F("!Last TDO:"), last_tdo(),
+				   last_dr_size_bits());
 }
 
 /*
@@ -127,10 +129,8 @@ bool XSVFPlayer::handle_next_instruction()
 	uint8_t instruction = getNextByte();
 	incrementInstructionCounter();
 	setStringBuffer(instruction_name(instruction));
-	serialComm().Debug(F("%d - Handling %s(0x%02X)"),
-		instructionCounter(),
-		stringBuffer(),
-		instruction);
+	serialComm().Debug(F("%d - Handling %s(0x%02X)"), instructionCounter(),
+			   stringBuffer(), instruction);
 	switch (instruction) {
 		DECODE(XCOMPLETE);
 		DECODE(XTDOMASK);
@@ -161,10 +161,12 @@ bool XSVFPlayer::handle_next_instruction()
 		DECODE(XCOMMENT);
 		DECODE(XWAIT);
 	default:
-		serialComm().Important(F("Unimplemented instruction: %s(0x%02X)"),
-			stringBuffer(), instruction);
-		return false;
+		serialComm().Important(
+		    F("Unimplemented instruction: %s(0x%02X)"), stringBuffer(),
+		    instruction);
+		break;
 	}
+	return false;
 }
 
 #ifndef ARDUINO_ARCH_AVR
@@ -174,8 +176,8 @@ void XSVFPlayer::setStringBuffer(const __FlashStringHelper *s)
 	size_t n = strlen_P(p);
 	if (n > S_STRING_BUFFER_SIZE - 1) {
 		serialComm().Debug(
-			F(">>>>>>>>>>>> String truncated by %d bytes."),
-			n - S_STRING_BUFFER_SIZE + 1);
+		    F(">>>>>>>>>>>> String truncated by %d bytes."),
+		    n - S_STRING_BUFFER_SIZE + 1);
 	}
 	strncpy_P(m_string_buffer, p, S_STRING_BUFFER_SIZE);
 	m_string_buffer[S_STRING_BUFFER_SIZE - 1] = 0;
@@ -248,8 +250,8 @@ bool XSVFPlayer::decode_XCOMPLETE()
 bool XSVFPlayer::decode_XTDOMASK()
 {
 	getNextBytes(tdoMask(), sdrsizeBytes());
-	serialComm().DebugBytes(F("... TDO mask set to"),
-		tdoMask(), sdrsizeBytes());
+	serialComm().DebugBytes(F("... TDO mask set to"), tdoMask(),
+				sdrsizeBytes());
 
 	return true;
 }
@@ -259,9 +261,10 @@ bool XSVFPlayer::decode_XSIR()
 	setSirsizeBits(getNextByte());
 	if (sirsizeBytes() > S_MAX_CHAIN_SIZE_BYTES) {
 		serialComm().Important(
-			F("Requested IR size (%d bits) is greater than the maximum chain"
-			" size supported by this programmer (%d bits)."),
-			sirsizeBits(), S_MAX_CHAIN_SIZE_BITS);
+		    F("Requested IR size (%d bits) is greater than the maximum "
+		      "chain"
+		      " size supported by this programmer (%d bits)."),
+		    sirsizeBits(), S_MAX_CHAIN_SIZE_BITS);
 		return false;
 	}
 	getNextBytes(tdi(), sirsizeBytes());
@@ -284,15 +287,9 @@ bool XSVFPlayer::decode_XRUNTEST()
 	return true;
 }
 
-bool XSVFPlayer::decode_XRESERVED_5()
-{
-	return true;
-}
+bool XSVFPlayer::decode_XRESERVED_5() { return true; }
 
-bool XSVFPlayer::decode_XRESERVED_6()
-{
-	return true;
-}
+bool XSVFPlayer::decode_XRESERVED_6() { return true; }
 
 bool XSVFPlayer::decode_XREPEAT()
 {
@@ -307,13 +304,14 @@ bool XSVFPlayer::decode_XSDRSIZE()
 	setSdrSizeBits(getNextLong());
 	if (sdrsizeBytes() > S_MAX_CHAIN_SIZE_BYTES) {
 		serialComm().Important(
-			F("Requested DR size (%lu bits) is greater than the maximum chain"
-			" size supported by this programmer (%d bits)."),
-			sdrsizeBits(), S_MAX_CHAIN_SIZE_BITS);
+		    F("Requested DR size (%lu bits) is greater than the "
+		      "maximum chain"
+		      " size supported by this programmer (%d bits)."),
+		    sdrsizeBits(), S_MAX_CHAIN_SIZE_BITS);
 		return false;
 	}
 	serialComm().Debug(F("... sdrsize set to %lu bits (%lu bytes)"),
-		sdrsizeBits(), sdrsizeBytes());
+			   sdrsizeBits(), sdrsizeBytes());
 
 	return true;
 }
@@ -330,12 +328,12 @@ bool XSVFPlayer::decode_XSETSDRMASKS()
 {
 	getNextBytes(addressMask(), sdrsizeBytes());
 	getNextBytes(dataMask(), sdrsizeBytes());
-	
+
 	return true;
 }
 
 #if IMPLEMENT_XSDRINC
-//bool XSVFPlayer::decode_XSDRINC() { return ; }
+// bool XSVFPlayer::decode_XSDRINC() { return ; }
 #endif // IMPLEMENT_XSDRINC
 
 bool XSVFPlayer::decode_XSDRB()
@@ -407,8 +405,8 @@ bool XSVFPlayer::decode_XENDIR()
 		break;
 	}
 	setStringBuffer(state_name(endirState()));
-	serialComm().Debug(F("... endir state set to %s(%d)"),
-		stringBuffer(), endirState());
+	serialComm().Debug(F("... endir state set to %s(%d)"), stringBuffer(),
+			   endirState());
 
 	return ret;
 }
@@ -430,8 +428,8 @@ bool XSVFPlayer::decode_XENDDR()
 		break;
 	}
 	setStringBuffer(state_name(enddrState()));
-	serialComm().Debug(F("... enddr state set to %s(%d)"),
-		stringBuffer(), enddrState());
+	serialComm().Debug(F("... enddr state set to %s(%d)"), stringBuffer(),
+			   enddrState());
 
 	return ret;
 }
@@ -467,4 +465,3 @@ bool XSVFPlayer::decode_XWAIT()
 
 	return true;
 }
-
