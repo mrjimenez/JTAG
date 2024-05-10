@@ -43,3 +43,7 @@ core.*
 .piolibdeps
 .clang_complete
 .gcc-flags.json
+
+# Arduino 2
+build
+

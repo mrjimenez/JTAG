@@ -34,6 +34,8 @@ public:
 	#define GPIO_REGISTER_TYPE uint32_t
 #elif defined ARDUINO_ARCH_ESP32
 	#define GPIO_REGISTER_TYPE uint32_t
+#elif defined ARDUINO_ARCH_RENESAS
+	#define GPIO_REGISTER_TYPE uint16_t
 #else
 	#define GPIO_REGISTER_TYPE uint8_t
 #endif
@@ -41,9 +43,9 @@ public:
 class ArduinoInputPin : public ArduinoPin
 {
 private:
-	volatile GPIO_REGISTER_TYPE *m_in;
+	const volatile GPIO_REGISTER_TYPE *m_in;
 
-	volatile GPIO_REGISTER_TYPE *in() const { return m_in; }
+	const volatile GPIO_REGISTER_TYPE *in() const { return m_in; }
 
 public:
 	ArduinoInputPin(uint8_t pin);
@@ -51,7 +53,6 @@ public:
 
 	uint8_t read() const { return *in() & getBit(); }
 };
-
 
 class ArduinoOutputPin : public ArduinoPin
 {

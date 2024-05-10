@@ -24,4 +24,3 @@ ArduinoOutputPin::ArduinoOutputPin(uint8_t pin)
 , m_out(portOutputRegister(port()))
 {
 }
-
