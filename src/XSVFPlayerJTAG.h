@@ -13,10 +13,10 @@ private:
 	JTAGTAP m_jtag_tap;
 	uint8_t m_current_state;
 
-        SerialComm &serialComm() { return m_serial_comm; }
+	SerialComm &serialComm() { return m_serial_comm; }
 
 	JTAGTAP &jtagTap() { return m_jtag_tap; }
-	
+
 	uint8_t currentState() const { return m_current_state; }
 	void setCurrentState(uint8_t n) { m_current_state = n; }
 
@@ -61,4 +61,3 @@ protected:
 };
 
 #endif // XSVFPLAYERJTAG_H
-
