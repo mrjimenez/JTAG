@@ -4,7 +4,7 @@ This library has four interesting things.
 
 First, it is a JTAG test access point (TAP) manipulation library. The code
 tries to be processor agnostic as much as possible, so that it can be used in
-the future in other platforms. JTAG is a powerfull interface, there are many
+the future in other platforms. JTAG is a powerful interface, there are many
 things that you can do besides programming devices. For example, you can do
 boundary scan tests, and even debug and take complete control of some hardware.
 
@@ -38,7 +38,7 @@ and TCK in your target board. Trust me, I've been there.
 
 Using VREF is important so that your Arduino knows your JTAG cable it is actually
 connected to something. Also, VREF could be used to power buffers to convert
-the Arduino signals to the right voltage level whithout the resistors I
+the Arduino signals to the right voltage level without the resistors I
 mentioned before.
 
 The pin configuration I used was this:
@@ -51,9 +51,7 @@ The pin configuration I used was this:
 | TCK    | 11 |
 | VREF   | 12 |
 
-
-Before using this software
-==========================
+## Before using this software
 
 You will need:
 
@@ -69,31 +67,28 @@ You will need:
    has two very interesting CPLD boards. I have personally used a XC2C64A
    breakout board. They also have a similar breakout board for the XC9572XL.
 
-
-Installing the library
-======================
+## Installing the library
 
 This software has been tested under the Arduino IDE version 1.6.5, but should
 work fine with version 1.0. The library should be unpacked to the "libraries"
 directory inside your Arduino "sketches" directory.
 
-
-Compiling
-=========
+## Compiling
 
 One quick suggestion: in order to get the most of the USB bandwidth, it is
 possible to increase the size of the receive buffer of the Arduino. I have also
 changed the default compiler optimization level. I added a file called
 "platform.local.txt" to the folder "~/arduino-1.6.5/hardware/arduino/avr" that
 had the following:
-```
+
+```config
 name=Arduino 256S AVR Boards
 version=1.6.7
 
 # AVR compile variables
 # ---------------------
 
-# This can be overriden in boards.txt
+# This can be overridden in boards.txt
 build.extra_flags=
 
 # These can be overridden in platform.local.txt
@@ -115,81 +110,68 @@ JTAGPortAVR uses the same pin configuration I have mentioned before, but since
 all the pins are on AVR's PORTB, all pins are written at once, so the JTAG port
 code is more efficient.
 
-Using it to play XSVF
-=====================
+## Using it to play XSVF
 
 1. The example sketch "JTAGTest" has been used in all my tests. Upload it to
    your Arduino board. Now you have a XSVF JTAG player.
-
-1. Inside the folder libraries/JTAG/extras/python, there is a python script
+2. Inside the folder libraries/JTAG/extras/python, there is a python script
    called xsvf. It has some command line parameters, but the default ones
    should be ok. You can use it to send more than one file in a sequence to
    your board. For example, suppose you are in a command prompt in the
    libraries/JTAG folder. Then, the following command will send the following
    four XSVF files to your Arduino board:
+
+```bash
+   ./extras/python/xsvf extras/xsvf/XC2C64A/{idcode.xsvf,blank_check.xsvf,erase.xsvf,VHDL-CPLDIntro3LEDinverse.xsvf}
 ```
-   $ ./extras/python/xsvf extras/xsvf/XC2C64A/{idcode.xsvf,blank_check.xsvf,erase.xsvf,VHDL-CPLDIntro3LEDinverse.xsvf}
-```
+
    Help is available for the command line parameters:
+
+```bash
+   $ ./extras/python/xsvf --help
+   usage: xsvf [-h] [-c {upload,disasm}] [-v] [-p PORT] [-b BAUD]
+                     fileName [fileName ...]
+
+   XSVF file processor.
+
+   positional arguments:
+      fileName              XSVF file names. (type FileType('rb'))
+
+   optional arguments:
+      -h, --help            show this help message and exit
+      -c {upload,disasm}, --command {upload,disasm}
+                           command to execute. (default=upload)
+      -v, --version         show program's version number and exit
+      -p PORT, --port PORT  Serial port device name (default=/dev/ttyACM0)
+      -b BAUD, --baud BAUD  BAUD rate (type int, default=115200)
+
+   Parameters can be in a file, one per line, using @"file name"
 ```
-	$ ./extras/python/xsvf --help
-	usage: xsvf [-h] [-c {upload,disasm}] [-v] [-p PORT] [-b BAUD]
-            	    fileName [fileName ...]
 
-	XSVF file processor.
-
-	positional arguments:
-  	  fileName              XSVF file names. (type FileType('rb'))
-
-	optional arguments:
-  	  -h, --help            show this help message and exit
-  	  -c {upload,disasm}, --command {upload,disasm}
-                        	command to execute. (default=upload)
-  	  -v, --version         show program's version number and exit
-  	  -p PORT, --port PORT  Serial port device name (default=/dev/ttyACM0)
-  	  -b BAUD, --baud BAUD  BAUD rate (type int, default=115200)
-
-	Parameters can be in a file, one per line, using @"file name"
-```
 1. In subfolders of the folder "extras/xsvf" you can find several XSVF files
    that you can use to test your hardware. Notice that you MUST use a XSVF file
    generated for your particular hardware. You can generate XSVF files with the
    software "impact", which comes with the Xilinx bundle.
-
-1. A failure in the execution of "blank_check.xsvf" means that the CPLD is not
+2. A failure in the execution of "blank_check.xsvf" means that the CPLD is not
    blank. The same file should be successful after the execution of
    "erase.xsvf".
 
-
-Interesting links
-=================
+## Interesting links
 
 1. [Generating an SVF, XSVF, or STAPL File with Impact](http://www.xilinx.com/support/documentation/sw_manuals/xilinx11/pp_p_process_generate_svf_file.htm)
+2. [Executing XSVF/SVF Files with Impact](http://www.xilinx.com/itp/xilinx10/isehelp/pim_p_executing_xsvf_svf.htm)
+3. [A JTAG/XSVF Library for Arduino](http://eeandcs.blogspot.com.br/2015/08/jtagxsvf-library-for-arduino.html)
+4. [A XSVF Assembler/Disassembler in python](http://eeandcs.blogspot.com.br/2015/09/a-xsvf-assemblerdisassembler-in-python.html)
+5. [SVF on Wikipedia](https://en.wikipedia.org/wiki/Serial_Vector_Format)
+6. [JTAG on Wikipedia](https://en.wikipedia.org/wiki/Joint_Test_Action_Group)
+7. [fpga4fun](http://www.fpga4fun.com/JTAG.html)
+8. [Rohit Dureja's JTAG Simplified](https://rohitdureja.wordpress.com/category/cpldfpga/)
+9. [Nice JTAG TAP Controller State Diagram in SVF](https://de.wikipedia.org/wiki/Datei:JTAG_TAP_Controller_State_Diagram.svg)
+10. YouTube video: [Como programar CPLD Xilinx con Arduino](https://youtu.be/x5eW9H1GoeA)
 
-1. [Executing XSVF/SVF Files with Impact](http://www.xilinx.com/itp/xilinx10/isehelp/pim_p_executing_xsvf_svf.htm)
+## Credits
 
-1. [A JTAG/XSVF Library for Arduino](http://eeandcs.blogspot.com.br/2015/08/jtagxsvf-library-for-arduino.html)
-
-1. [A XSVF Assembler/Disassembler in python](http://eeandcs.blogspot.com.br/2015/09/a-xsvf-assemblerdisassembler-in-python.html)
-
-1. [SVF on Wikipedia](https://en.wikipedia.org/wiki/Serial_Vector_Format)
-
-1. [JTAG on Wikipedia](https://en.wikipedia.org/wiki/Joint_Test_Action_Group)
-
-1. [fpga4fun](http://www.fpga4fun.com/JTAG.html)
-
-1. [Rohit Dureja's JTAG Simplified](https://rohitdureja.wordpress.com/category/cpldfpga/)
-
-1. [Nice JTAG TAP Controller State Diagram in SVF](https://de.wikipedia.org/wiki/Datei:JTAG_TAP_Controller_State_Diagram.svg)
-
-1. Youtube video: [Como programar CPLD Xilinx con Arduino](https://youtu.be/x5eW9H1GoeA)
-
-
-Credits
-=======
-
-I have used Xilinx [XAPP503 - SVF and XSVF File Formats for Xilinx Devices]
-(http://www.xilinx.com/support/documentation/application_notes/xapp503.pdf),
+I have used Xilinx [XAPP503 - SVF and XSVF File Formats for Xilinx Devices](http://www.xilinx.com/support/documentation/application_notes/xapp503.pdf),
 appendix B as the reference for XSVF.
 
 This software is actually a major rewrite of code and ideas inspired on many
@@ -203,11 +185,8 @@ other projects. As far as I could trace it:
 
 1. [Karl Hans Janke's jtagbang](http://www.khjk.org/log/2013/aug/jtagbang.html).
 
-
-About me
-========
+## About me
 
 [My blog is here](http://eeandcs.blogspot.com.br/).
 
 You may contact me on github.
-
