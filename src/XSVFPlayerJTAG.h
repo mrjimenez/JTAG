@@ -22,7 +22,8 @@ private:
 
 	void state_goto(int state);
 	void sir();
-	bool sdr(bool must_begin, bool must_end, bool use_mask, bool must_check);
+	bool sdr(bool must_begin, bool must_check, bool use_mask,
+		 bool must_end);
 	bool is_tdo_as_expected(bool use_mask);
 
 public:
