@@ -1,50 +1,48 @@
 
-#include <JTAGTAP.h>
+#include "JTAGTAP.h"
 
 /*
  * Low nibble : TMS == 0
  * High nibble: TMS == 1
  */
 
-#define TMS_T(TMS_HIGH_STATE, TMS_LOW_STATE) (((TMS_HIGH_STATE) << 4) | (TMS_LOW_STATE))
+#define TMS_T(TMS_HIGH_STATE, TMS_LOW_STATE)                                   \
+	(((TMS_HIGH_STATE) << 4) | (TMS_LOW_STATE))
 
 static const uint8_t tms_transitions[] = {
-	/* STATE_TEST_LOGIC_RESET */ TMS_T(STATE_TEST_LOGIC_RESET, STATE_RUN_TEST_IDLE),
-	/* STATE_RUN_TEST_IDLE    */ TMS_T(STATE_SELECT_DR_SCAN,   STATE_RUN_TEST_IDLE),
-	/* STATE_SELECT_DR_SCAN   */ TMS_T(STATE_SELECT_IR_SCAN,   STATE_CAPTURE_DR),
-	/* STATE_CAPTURE_DR       */ TMS_T(STATE_EXIT1_DR,         STATE_SHIFT_DR),
-	/* STATE_SHIFT_DR         */ TMS_T(STATE_EXIT1_DR,         STATE_SHIFT_DR),
-	/* STATE_EXIT1_DR         */ TMS_T(STATE_UPDATE_DR,        STATE_PAUSE_DR),
-	/* STATE_PAUSE_DR         */ TMS_T(STATE_EXIT2_DR,         STATE_PAUSE_DR),
-	/* STATE_EXIT2_DR         */ TMS_T(STATE_UPDATE_DR,        STATE_SHIFT_DR),
-	/* STATE_UPDATE_DR        */ TMS_T(STATE_SELECT_DR_SCAN,   STATE_RUN_TEST_IDLE),
-	/* STATE_SELECT_IR_SCAN   */ TMS_T(STATE_TEST_LOGIC_RESET, STATE_CAPTURE_IR),
-	/* STATE_CAPTURE_IR       */ TMS_T(STATE_EXIT1_IR,         STATE_SHIFT_IR),
-	/* STATE_SHIFT_IR         */ TMS_T(STATE_EXIT1_IR,         STATE_SHIFT_IR),
-	/* STATE_EXIT1_IR         */ TMS_T(STATE_UPDATE_IR,        STATE_PAUSE_IR),
-	/* STATE_PAUSE_IR         */ TMS_T(STATE_EXIT2_IR,         STATE_PAUSE_IR),
-	/* STATE_EXIT2_IR         */ TMS_T(STATE_UPDATE_IR,        STATE_SHIFT_IR),
-	/* STATE_UPDATE_IR        */ TMS_T(STATE_SELECT_DR_SCAN,   STATE_RUN_TEST_IDLE),
+    /* STATE_TEST_LOGIC_RESET */ TMS_T(STATE_TEST_LOGIC_RESET,
+				       STATE_RUN_TEST_IDLE),
+    /* STATE_RUN_TEST_IDLE    */
+    TMS_T(STATE_SELECT_DR_SCAN, STATE_RUN_TEST_IDLE),
+    /* STATE_SELECT_DR_SCAN   */ TMS_T(STATE_SELECT_IR_SCAN, STATE_CAPTURE_DR),
+    /* STATE_CAPTURE_DR       */ TMS_T(STATE_EXIT1_DR, STATE_SHIFT_DR),
+    /* STATE_SHIFT_DR         */ TMS_T(STATE_EXIT1_DR, STATE_SHIFT_DR),
+    /* STATE_EXIT1_DR         */ TMS_T(STATE_UPDATE_DR, STATE_PAUSE_DR),
+    /* STATE_PAUSE_DR         */ TMS_T(STATE_EXIT2_DR, STATE_PAUSE_DR),
+    /* STATE_EXIT2_DR         */ TMS_T(STATE_UPDATE_DR, STATE_SHIFT_DR),
+    /* STATE_UPDATE_DR        */
+    TMS_T(STATE_SELECT_DR_SCAN, STATE_RUN_TEST_IDLE),
+    /* STATE_SELECT_IR_SCAN   */
+    TMS_T(STATE_TEST_LOGIC_RESET, STATE_CAPTURE_IR),
+    /* STATE_CAPTURE_IR       */ TMS_T(STATE_EXIT1_IR, STATE_SHIFT_IR),
+    /* STATE_SHIFT_IR         */ TMS_T(STATE_EXIT1_IR, STATE_SHIFT_IR),
+    /* STATE_EXIT1_IR         */ TMS_T(STATE_UPDATE_IR, STATE_PAUSE_IR),
+    /* STATE_PAUSE_IR         */ TMS_T(STATE_EXIT2_IR, STATE_PAUSE_IR),
+    /* STATE_EXIT2_IR         */ TMS_T(STATE_UPDATE_IR, STATE_SHIFT_IR),
+    /* STATE_UPDATE_IR        */
+    TMS_T(STATE_SELECT_DR_SCAN, STATE_RUN_TEST_IDLE),
 };
 
-#define BITSTR(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P) ( \
-	((uint16_t)(A) << 15) | \
-	((uint16_t)(B) << 14) | \
-	((uint16_t)(C) << 13) | \
-	((uint16_t)(D) << 12) | \
-	((uint16_t)(E) << 11) | \
-	((uint16_t)(F) << 10) | \
-	((uint16_t)(G) <<  9) | \
-	((uint16_t)(H) <<  8) | \
-	((uint16_t)(I) <<  7) | \
-	((uint16_t)(J) <<  6) | \
-	((uint16_t)(K) <<  5) | \
-	((uint16_t)(L) <<  4) | \
-	((uint16_t)(M) <<  3) | \
-	((uint16_t)(N) <<  2) | \
-	((uint16_t)(O) <<  1) | \
-	((uint16_t)(P) <<  0) )
+#define BITSTR(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)                 \
+	(((uint16_t)(A) << 15) | ((uint16_t)(B) << 14) |                       \
+	 ((uint16_t)(C) << 13) | ((uint16_t)(D) << 12) |                       \
+	 ((uint16_t)(E) << 11) | ((uint16_t)(F) << 10) |                       \
+	 ((uint16_t)(G) << 9) | ((uint16_t)(H) << 8) | ((uint16_t)(I) << 7) |  \
+	 ((uint16_t)(J) << 6) | ((uint16_t)(K) << 5) | ((uint16_t)(L) << 4) |  \
+	 ((uint16_t)(M) << 3) | ((uint16_t)(N) << 2) | ((uint16_t)(O) << 1) |  \
+	 ((uint16_t)(P) << 0))
 
+// clang-format off
 /*
  * The index of this vector is the current state. The i-th bit tells you the
  * value TMS must assume in order to go to state "i".
@@ -89,6 +87,7 @@ static const uint16_t tms_map[] = {
 /* STATE_EXIT2_IR         */ BITSTR(  1, 0, 0, 0,   0, 1, 1, 1,   1, 1, 1, 1,   1, 1, 1, 1  ),
 /* STATE_UPDATE_IR        */ BITSTR(  0, 1, 1, 1,   1, 1, 1, 1,   1, 1, 1, 1,   1, 1, 0, 1  ),
 };
+// clang-format on
 
 JTAGTAP::JTAGTAP(SerialComm &s, JTAGPort &j)
 : m_serial_comm(s)
@@ -96,21 +95,18 @@ JTAGTAP::JTAGTAP(SerialComm &s, JTAGPort &j)
 , m_current_state(STATE_TEST_LOGIC_RESET)
 {
 	if (!jtagPort().read_vref()) {
-		serialComm().Quit(-10,
-			F("VREF is not present. Please, check the cable."));
+		serialComm().Quit(
+		    -10, F("VREF is not present. Please, check the cable."));
 	}
 }
 
-void JTAGTAP::shift_td(
-	uint8_t *input_data,
-	uint8_t *output_data,
-	uint32_t data_bits,
-	bool must_end)
+void JTAGTAP::shift_td(uint8_t *input_data, uint8_t *output_data,
+		       uint32_t data_bits, bool must_end)
 {
 	uint32_t bit_count = data_bits;
 	uint32_t byte_count = numBytes(data_bits);
-	serialComm().Debug(F("... shifting %lu bits (%lu bytes)"),
-		data_bits, byte_count);
+	serialComm().Debug(F("... shifting %lu bits (%lu bytes)"), data_bits,
+			   byte_count);
 	serialComm().DebugBytes(F("... data:     "), input_data, byte_count);
 	for (uint32_t i = 0; i < byte_count; ++i) {
 		uint8_t byte_out = input_data[byte_count - 1 - i];
@@ -177,4 +173,3 @@ void JTAGTAP::wait_time(uint32_t microseconds)
 		jtagPort().pulse_clock();
 	}
 }
-

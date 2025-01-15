@@ -1,10 +1,11 @@
 #ifndef JTAGPORTARDUINO_H
 #define JTAGPORTARDUINO_H
 
-#include <JTAGPort.h>
+#include "JTAGPort.h"
 
 #include <Arduino.h>
-#include <ArduinoPin.h>
+
+#include "ArduinoPin.h"
 
 /*
  * This is a slight slower version of JTAGPort, but does not require a
@@ -28,13 +29,8 @@ private:
 	bool vrefIsAnalog() const { return m_vref_is_analog; }
 
 public:
-	JTAGPortArduino(
-		uint8_t tms,
-		uint8_t tdi,
-		uint8_t tdo,
-		uint8_t tck,
-		uint8_t vref,
-		bool vref_is_analog = false);
+	JTAGPortArduino(uint8_t tms, uint8_t tdi, uint8_t tdo, uint8_t tck,
+			uint8_t vref, bool vref_is_analog = false);
 
 	~JTAGPortArduino() {}
 
@@ -70,5 +66,4 @@ public:
 	}
 };
 
-#endif  // JTAGPORTARDUINO_H
-
+#endif // JTAGPORTARDUINO_H

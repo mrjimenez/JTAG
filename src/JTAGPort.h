@@ -21,5 +21,4 @@ public:
 	virtual bool read_vref() const = 0;
 };
 
-#endif  // JTAGPORT_H
-
+#endif // JTAGPORT_H

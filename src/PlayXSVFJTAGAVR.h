@@ -3,10 +3,10 @@
 #ifndef PLAYXSVFJTAGAVR_H
 #define PLAYXSVFJTAGAVR_H
 
-#include <JTAGPortAVR.h>
-#include <PlayXSVF.h>
-#include <SerialComm.h>
-#include <XSVFPlayerJTAG.h>
+#include "JTAGPortAVR.h"
+#include "PlayXSVF.h"
+#include "SerialComm.h"
+#include "XSVFPlayerJTAG.h"
 
 class PlayXSVFJTAGAVR : public PlayXSVF
 {
@@ -22,9 +22,7 @@ protected:
 	XSVFPlayer &xsvfPlayer() { return m_xsvf_player; }
 
 public:
-	PlayXSVFJTAGAVR(
-		Stream &s,
-		int stream_buffer_size);
+	PlayXSVFJTAGAVR(Stream &s, int stream_buffer_size);
 	~PlayXSVFJTAGAVR() {}
 	SerialComm &serialComm() { return m_serial_comm; }
 };
@@ -32,4 +30,3 @@ public:
 #endif // PLAYXSVFJTAGAVR_H
 
 #endif // ARDUINO_ARCH_AVR
-

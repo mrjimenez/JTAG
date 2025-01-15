@@ -2,8 +2,8 @@
 #ifndef JTAGWHISPERER_H
 #define JTAGWHISPERER_H
 
-#include <JTAGTAP.h>
-#include <SerialComm.h>
+#include "JTAGTAP.h"
+#include "SerialComm.h"
 
 #define IMPLEMENT_XSDRINC 0
 
@@ -29,7 +29,8 @@ private:
 	bool m_xcomplete;
 
 	static const uint32_t S_MAX_CHAIN_SIZE_BYTES = 129;
-	static const uint32_t S_MAX_CHAIN_SIZE_BITS = S_MAX_CHAIN_SIZE_BYTES * 8;
+	static const uint32_t S_MAX_CHAIN_SIZE_BITS =
+	    S_MAX_CHAIN_SIZE_BYTES * 8;
 	uint8_t m_tdi[S_MAX_CHAIN_SIZE_BYTES];
 	uint8_t m_tdo[S_MAX_CHAIN_SIZE_BYTES];
 	uint8_t m_tdo_mask[S_MAX_CHAIN_SIZE_BYTES];
@@ -48,8 +49,7 @@ private:
 	static const uint32_t S_STRING_BUFFER_SIZE = 23;
 	char m_string_buffer[S_STRING_BUFFER_SIZE];
 
-	enum e_XSVF_Instruction
-	{
+	enum e_XSVF_Instruction {
 		XCOMPLETE = 0,
 		XTDOMASK,
 		XSIR,
@@ -76,7 +76,7 @@ private:
 		XWAIT
 	};
 
-        SerialComm &serialComm() { return m_serial_comm; }
+	SerialComm &serialComm() { return m_serial_comm; }
 	SerialComm &serialComm() const { return m_serial_comm; }
 
 #ifdef ARDUINO_ARCH_AVR
@@ -88,12 +88,12 @@ private:
 			addStreamSum(c);
 		} else {
 			serialComm().Quit(ERR_SERIAL_PORT_TIMEOUT,
-				F("Serial port timeout!"));
+					  F("Serial port timeout!"));
 		}
 
 		return static_cast<uint8_t>(c);
 	}
-#else // ARDUINO_ARCH_AVR
+#else  // ARDUINO_ARCH_AVR
 	uint8_t nextByte();
 #endif // ARDUINO_ARCH_AVR
 
@@ -105,15 +105,14 @@ private:
 
 	// Returns the next double word from the stream.
 	uint32_t getNextLong();
-	
+
 	// Stores the next count bytes from the stream into data.
 	void getNextBytes(uint8_t *data, uint32_t count);
 
 	const __FlashStringHelper *error_message(int error_code);
 
 public:
-	enum e_Error_Code
-	{
+	enum e_Error_Code {
 		ERR_NO_ERROR = 0,
 		//
 		ERR_SERIAL_PORT_TIMEOUT = -1,
@@ -125,7 +124,7 @@ public:
 	};
 
 	XSVFPlayer(SerialComm &s);
-	
+
 	~XSVFPlayer();
 
 	bool reached_xcomplete() const { return xcomplete(); }
@@ -154,19 +153,19 @@ protected:
 		size_t n = strlen_P(p);
 		if (n > S_STRING_BUFFER_SIZE - 1) {
 			serialComm().Debug(
-				F(">>>>>>>>>>>> String truncated by %d bytes."),
-				n - S_STRING_BUFFER_SIZE + 1);
+			    F(">>>>>>>>>>>> String truncated by %d bytes."),
+			    n - S_STRING_BUFFER_SIZE + 1);
 		}
 		strncpy_P(m_string_buffer, p, S_STRING_BUFFER_SIZE);
 		m_string_buffer[S_STRING_BUFFER_SIZE - 1] = 0;
 	}
-#else // ARDUINO_ARCH_AVR
+#else  // ARDUINO_ARCH_AVR
 	void setStringBuffer(const __FlashStringHelper *s);
 #endif // ARDUINO_ARCH_AVR
-	
+
 	const __FlashStringHelper *instruction_name(uint8_t instruction);
 	const __FlashStringHelper *state_name(uint8_t state);
-	
+
 	uint8_t nextState() const { return m_next_state; }
 	void setNextState(uint8_t n) { m_next_state = n; }
 
@@ -293,5 +292,4 @@ protected:
 	virtual bool execute_XWAIT() = 0;
 };
 
-#endif  // JTAGWHISPERER_H
-
+#endif // JTAGWHISPERER_H

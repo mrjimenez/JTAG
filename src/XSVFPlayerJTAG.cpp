@@ -1,5 +1,5 @@
 
-#include <XSVFPlayerJTAG.h>
+#include "XSVFPlayerJTAG.h"
 
 XSVFPlayerJTAG::XSVFPlayerJTAG(SerialComm &s, JTAGPort &j)
 : XSVFPlayer(s)
@@ -9,82 +9,40 @@ XSVFPlayerJTAG::XSVFPlayerJTAG(SerialComm &s, JTAGPort &j)
 {
 }
 
-bool XSVFPlayerJTAG::execute_XCOMPLETE()
-{
-	return false;
-}
+bool XSVFPlayerJTAG::execute_XCOMPLETE() { return false; }
 
-bool XSVFPlayerJTAG::execute_XTDOMASK()
-{
-	return true;
-}
+bool XSVFPlayerJTAG::execute_XTDOMASK() { return true; }
 
 bool XSVFPlayerJTAG::execute_XSIR()
 {
 	sir();
-	
+
 	return true;
 }
 
-bool XSVFPlayerJTAG::execute_XSDR()
-{
-	return sdr(true, true, true, true);
-}
+bool XSVFPlayerJTAG::execute_XSDR() { return sdr(true, true, true, true); }
 
-bool XSVFPlayerJTAG::execute_XRUNTEST()
-{
-	return true;
-}
+bool XSVFPlayerJTAG::execute_XRUNTEST() { return true; }
 
-bool XSVFPlayerJTAG::execute_XRESERVED_5()
-{
-	return true;
-}
+bool XSVFPlayerJTAG::execute_XRESERVED_5() { return true; }
 
-bool XSVFPlayerJTAG::execute_XRESERVED_6()
-{
-	return true;
-}
+bool XSVFPlayerJTAG::execute_XRESERVED_6() { return true; }
 
-bool XSVFPlayerJTAG::execute_XREPEAT()
-{
-	return true;
-}
+bool XSVFPlayerJTAG::execute_XREPEAT() { return true; }
 
-bool XSVFPlayerJTAG::execute_XSDRSIZE()
-{
-	return true;
-}
+bool XSVFPlayerJTAG::execute_XSDRSIZE() { return true; }
 
-bool XSVFPlayerJTAG::execute_XSDRTDO()
-{
-	return sdr(true, true, true, true);
-}
+bool XSVFPlayerJTAG::execute_XSDRTDO() { return sdr(true, true, true, true); }
 
-bool XSVFPlayerJTAG::execute_XSETSDRMASKS()
-{
-	return true;
-}
+bool XSVFPlayerJTAG::execute_XSETSDRMASKS() { return true; }
 
-bool XSVFPlayerJTAG::execute_XSDRINC()
-{
-	return false;
-}
+bool XSVFPlayerJTAG::execute_XSDRINC() { return false; }
 
-bool XSVFPlayerJTAG::execute_XSDRB()
-{
-	return sdr(true, false, false, false);
-}
+bool XSVFPlayerJTAG::execute_XSDRB() { return sdr(true, false, false, false); }
 
-bool XSVFPlayerJTAG::execute_XSDRC()
-{
-	return sdr(false, false, false, false);
-}
+bool XSVFPlayerJTAG::execute_XSDRC() { return sdr(false, false, false, false); }
 
-bool XSVFPlayerJTAG::execute_XSDRE()
-{
-	return sdr(false, false, false, true);
-}
+bool XSVFPlayerJTAG::execute_XSDRE() { return sdr(false, false, false, true); }
 
 bool XSVFPlayerJTAG::execute_XSDRTDOB()
 {
@@ -108,15 +66,9 @@ bool XSVFPlayerJTAG::execute_XSTATE()
 	return true;
 }
 
-bool XSVFPlayerJTAG::execute_XENDIR()
-{
-	return true;
-}
+bool XSVFPlayerJTAG::execute_XENDIR() { return true; }
 
-bool XSVFPlayerJTAG::execute_XENDDR()
-{
-	return true;
-}
+bool XSVFPlayerJTAG::execute_XENDDR() { return true; }
 
 bool XSVFPlayerJTAG::execute_XSIR2()
 {
@@ -125,14 +77,9 @@ bool XSVFPlayerJTAG::execute_XSIR2()
 	return true;
 }
 
-bool XSVFPlayerJTAG::execute_XCOMMENT()
-{
-	return true;
-}
+bool XSVFPlayerJTAG::execute_XCOMMENT() { return true; }
 
-void XSVFPlayerJTAG::execute_XCOMMENT_auxiliar(uint8_t /*c*/)
-{
-}
+void XSVFPlayerJTAG::execute_XCOMMENT_auxiliar(uint8_t /*c*/) {}
 
 bool XSVFPlayerJTAG::execute_XWAIT()
 {
@@ -148,8 +95,8 @@ void XSVFPlayerJTAG::state_goto(int state)
 	jtagTap().state_goto(state);
 	setCurrentState(state);
 	setStringBuffer(state_name(state));
-	serialComm().Debug(F("... current state is now %s(%d)"),
-		stringBuffer(), state);
+	serialComm().Debug(F("... current state is now %s(%d)"), stringBuffer(),
+			   state);
 }
 
 void XSVFPlayerJTAG::sir()
@@ -165,7 +112,8 @@ void XSVFPlayerJTAG::sir()
 	}
 }
 
-bool XSVFPlayerJTAG::sdr(bool must_begin, bool must_check, bool use_mask, bool must_end)
+bool XSVFPlayerJTAG::sdr(bool must_begin, bool must_check, bool use_mask,
+			 bool must_end)
 {
 	int attempts_left = repeat();
 	bool matched = false;
@@ -190,7 +138,7 @@ bool XSVFPlayerJTAG::sdr(bool must_begin, bool must_check, bool use_mask, bool m
 			state_goto(STATE_SHIFT_DR);
 			if (attempts_left >= 0) {
 				serialComm().Debug(F("...... repeating: %d"),
-					repeat() - attempts_left);
+						   repeat() - attempts_left);
 			}
 		}
 	}
@@ -212,10 +160,9 @@ bool XSVFPlayerJTAG::sdr(bool must_begin, bool must_check, bool use_mask, bool m
 
 bool XSVFPlayerJTAG::is_tdo_as_expected(bool use_mask)
 {
-	serialComm().DebugBytes(F("... TDO mask: "),
-		tdoMask(), sdrsizeBytes());
-	serialComm().DebugBytes(F("... expecting:"),
-		tdoExpected(), sdrsizeBytes());
+	serialComm().DebugBytes(F("... TDO mask: "), tdoMask(), sdrsizeBytes());
+	serialComm().DebugBytes(F("... expecting:"), tdoExpected(),
+				sdrsizeBytes());
 	serialComm().DebugBytes(F("... received: "), tdo(), sdrsizeBytes());
 	for (uint32_t i = 0; i < sdrsizeBytes(); ++i) {
 		uint8_t expected = tdoExpected()[i];
@@ -267,4 +214,3 @@ void XSVFPlayerJTAG::test_code(int i)
 		}
 	}
 }
-

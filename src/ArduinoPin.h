@@ -29,15 +29,15 @@ public:
 };
 
 #ifdef ARDUINO_ARCH_AVR
-	#define GPIO_REGISTER_TYPE uint8_t
+#define GPIO_REGISTER_TYPE uint8_t
 #elif defined ARDUINO_ARCH_ESP8266
-	#define GPIO_REGISTER_TYPE uint32_t
+#define GPIO_REGISTER_TYPE uint32_t
 #elif defined ARDUINO_ARCH_ESP32
-	#define GPIO_REGISTER_TYPE uint32_t
+#define GPIO_REGISTER_TYPE uint32_t
 #elif defined ARDUINO_ARCH_RENESAS
-	#define GPIO_REGISTER_TYPE uint16_t
+#define GPIO_REGISTER_TYPE uint16_t
 #else
-	#define GPIO_REGISTER_TYPE uint8_t
+#define GPIO_REGISTER_TYPE uint8_t
 #endif
 
 class ArduinoInputPin : public ArduinoPin

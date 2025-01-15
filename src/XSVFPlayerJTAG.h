@@ -2,9 +2,9 @@
 #ifndef XSVFPLAYERJTAG_H
 #define XSVFPLAYERJTAG_H
 
-#include <JTAGTAP.h>
-#include <SerialComm.h>
-#include <XSVFPlayer.h>
+#include "JTAGTAP.h"
+#include "SerialComm.h"
+#include "XSVFPlayer.h"
 
 class XSVFPlayerJTAG : public XSVFPlayer
 {

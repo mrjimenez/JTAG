@@ -11,7 +11,7 @@
 //
 
 #ifndef SERIAL_RX_BUFFER_SIZE
-	#define SERIAL_RX_BUFFER_SIZE 64
+#define SERIAL_RX_BUFFER_SIZE 64
 #endif /* SERIAL_RX_BUFFER_SIZE */
 
 void setup()

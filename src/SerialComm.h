@@ -13,28 +13,43 @@ private:
 
 	Stream &m_serial;
 
-        bool m_already_asked;
+	bool m_already_asked;
 
-        char m_send_msg[6];
+	char m_send_msg[6];
 	char m_format_buffer[S_FORMAT_BUFFER_SIZE];
 
-        unsigned int m_stream_buffer_capacity;
-        unsigned int m_stream_buffer_threshold;
-        unsigned int m_stream_buffer_checkpoint;
-        uint32_t m_stream_count;
+	unsigned int m_stream_buffer_capacity;
+	unsigned int m_stream_buffer_threshold;
+	unsigned int m_stream_buffer_checkpoint;
+	uint32_t m_stream_count;
 
 	Stream &serial() const { return m_serial; }
 
-        bool alreadyAsked() const { return m_already_asked; }
-        void setAlreadyAsked() { m_already_asked = true; }
+	bool alreadyAsked() const { return m_already_asked; }
+	void setAlreadyAsked() { m_already_asked = true; }
 
-	unsigned int streamBufferCapacity() const { return m_stream_buffer_capacity; }
-	void setStreamBufferCapacity(unsigned int n) { m_stream_buffer_capacity = n; }
-	
-	unsigned int streamBufferThreshold() const { return m_stream_buffer_threshold; }
-	void setStreamBufferThreshold(unsigned int n) { m_stream_buffer_threshold = n; }
+	unsigned int streamBufferCapacity() const
+	{
+		return m_stream_buffer_capacity;
+	}
+	void setStreamBufferCapacity(unsigned int n)
+	{
+		m_stream_buffer_capacity = n;
+	}
 
-	unsigned int streamBufferCheckpoint() const { return m_stream_buffer_checkpoint; }
+	unsigned int streamBufferThreshold() const
+	{
+		return m_stream_buffer_threshold;
+	}
+	void setStreamBufferThreshold(unsigned int n)
+	{
+		m_stream_buffer_threshold = n;
+	}
+
+	unsigned int streamBufferCheckpoint() const
+	{
+		return m_stream_buffer_checkpoint;
+	}
 	void updateCheckpoint()
 	{
 		m_stream_buffer_checkpoint += streamBufferThreshold();
@@ -56,14 +71,16 @@ public:
 	uint32_t streamCount() const { return m_stream_count; }
 
 	void Important(const __FlashStringHelper *fmt, ...);
-	void ImportantBits(const __FlashStringHelper *msg, const uint8_t *pb, uint32_t count_bits);
+	void ImportantBits(const __FlashStringHelper *msg, const uint8_t *pb,
+			   uint32_t count_bits);
 	void Quit(int error_code, const __FlashStringHelper *message) const;
 	void print_bytes(const uint8_t *pb, uint32_t count, bool lf = false);
 
 	void DebugStartMessage() const;
 	void DebugContMessage(const __FlashStringHelper *ifsh, ...);
 	void Debug(const __FlashStringHelper *fmt, ...);
-	void DebugBytes(const __FlashStringHelper *s, const uint8_t* p, uint8_t n);
+	void DebugBytes(const __FlashStringHelper *s, const uint8_t *p,
+			uint8_t n);
 
 private:
 	char *formatBuffer() { return m_format_buffer; }
@@ -72,5 +89,4 @@ private:
 	void Ready(const __FlashStringHelper *message) const;
 };
 
-#endif  // SERIALCOMM_H
-
+#endif // SERIALCOMM_H
